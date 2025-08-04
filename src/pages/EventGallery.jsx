@@ -164,16 +164,20 @@ export default function EventGallery({ apiBase }) {
   return (
     <div className="event-gallery-container">
       {uploading && (
-        <div className="loading-overlay">
-          <div className="progress-container">
-            <div
-              className="progress-bar"
-              style={{ width: `${uploadProgress}%` }}
-            />
-            <span>{uploadProgress}%</span>
+        <div className="upload-overlay">
+          <div className="upload-progress-box">
+            Uploading images…
+            <div className="upload-bar-wrapper">
+              <div
+                className="upload-bar"
+                style={{ width: `${uploadProgress}%` }}
+              />
+            </div>
+            <div style={{ marginTop: "0.5rem" }}>{uploadProgress}%</div>
           </div>
         </div>
       )}
+
       <header className="header-toolbar">
         <Link to="/" className="header-logo-link">
           <img src={Logo} alt="Manchester Gents Logo" className="header-logo" />
