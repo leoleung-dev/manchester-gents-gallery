@@ -178,7 +178,6 @@ export default function EventGallery({ apiBase }) {
         </div>
       )}
 
-      {/* ⬇️ Updated: Responsive grid layout */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {photos.map(photo => {
           const isSel = selectedIds.has(photo._id)
