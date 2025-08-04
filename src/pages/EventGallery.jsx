@@ -11,6 +11,7 @@ import { FaUpload, FaDownload, FaSyncAlt } from "react-icons/fa";
 
 export default function EventGallery({ apiBase }) {
   const { slug } = useParams();
+  const [eventTitle, setEventTitle] = useState(slug);
   const [photos, setPhotos] = useState([]);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -45,6 +46,22 @@ export default function EventGallery({ apiBase }) {
       console.error("Failed to fetch photos", err);
     }
   }, [slug, API]);
+
+  // 🆕 Fetch event title
+  useEffect(() => {
+    async function fetchTitle() {
+      try {
+        const res = await fetch(`${API}/api/getEventSlugs`);
+        if (!res.ok) throw new Error("Failed to fetch event metadata");
+        const data = await res.json();
+        const match = data.find((e) => e.slug === slug);
+        if (match?.title) setEventTitle(match.title);
+      } catch (err) {
+        console.warn("Could not load event title, using slug.");
+      }
+    }
+    fetchTitle();
+  }, [API, slug]);
 
   useEffect(() => {
     loadPhotos();
@@ -181,7 +198,7 @@ export default function EventGallery({ apiBase }) {
         <Link to="/" className="header-logo-link">
           <img src={Logo} alt="Manchester Gents Logo" className="header-logo" />
         </Link>
-        <h1 className="event-gallery-title">Event: {slug}</h1>
+        <h1 className="event-gallery-title">{eventTitle}</h1>
         <div className="event-gallery-buttons">
           <button
             onClick={() => fileInputRef.current.click()}
