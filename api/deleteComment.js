@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client'
+import setCorsHeaders from '../src/lib/setCorsHeaders.js'
 
 const client = createClient({
   projectId: process.env.SANITY_PROJECT_ID,

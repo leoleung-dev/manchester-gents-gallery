@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client'
+import setCorsHeaders from '../src/lib/setCorsHeaders.js'
 
 export const config = {
   api: {
@@ -47,6 +48,8 @@ export default async function handler(req, res) {
     const event = await sanityClient.fetch(
       '*[_type=="event" && slug.current == $slug][0]{_id}',
       { slug: eventSlug }
+  setCorsHeaders(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
     )
 
     if (!event) {

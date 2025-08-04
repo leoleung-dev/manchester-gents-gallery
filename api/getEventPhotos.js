@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client'
+import setCorsHeaders from '../src/lib/setCorsHeaders.js'
 
 const client = createClient({
   projectId: process.env.SANITY_PROJECT_ID,
@@ -30,6 +31,8 @@ export default async function handler(req, res) {
           _createdAt
         }`,
       { slug }
+  setCorsHeaders(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
     )
 
     res.status(200).json(photos)

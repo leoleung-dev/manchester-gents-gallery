@@ -1,4 +1,5 @@
 import { createClient } from "@sanity/client";
+import setCorsHeaders from "../src/lib/setCorsHeaders.js"; // adjust if needed
 
 const client = createClient({
   projectId: process.env.SANITY_PROJECT_ID,
@@ -9,15 +10,8 @@ const client = createClient({
 });
 
 export default async function handler(req, res) {
-  // ✅ Allow your custom domain to make fetch requests
-  res.setHeader("Access-Control-Allow-Origin", "https://photos.manchestergents.com");
-  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  // ✅ Handle preflight OPTIONS request (important for CORS compliance)
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+  setCorsHeaders(res);
+  if (req.method === "OPTIONS") return res.status(200).end();
 
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
