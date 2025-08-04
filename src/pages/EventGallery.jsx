@@ -178,11 +178,15 @@ export default function EventGallery({ apiBase }) {
         </div>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {/* Masonry Layout */}
+      <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
         {photos.map(photo => {
           const isSel = selectedIds.has(photo._id)
           return (
-            <div key={photo._id} className="relative group">
+            <div
+              key={photo._id}
+              className="break-inside-avoid relative group"
+            >
               <input
                 type="checkbox"
                 className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
