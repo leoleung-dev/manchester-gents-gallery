@@ -1,4 +1,3 @@
-import '../src/lib/loadEnv.js'
 import { createClient } from '@sanity/client'
 
 const client = createClient({
@@ -24,9 +23,11 @@ export default async function handler(req, res) {
       '*[_id == $id][0]{ "assetRef": image.asset._ref }',
       { id }
     )
+
     if (!photo?.assetRef) {
       return res.status(404).json({ success: false, message: 'Photo not found' })
     }
+
     const { assetRef } = photo
 
     // 2) Find all comments referencing the photo

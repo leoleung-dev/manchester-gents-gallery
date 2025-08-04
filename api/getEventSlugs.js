@@ -1,4 +1,3 @@
-import '../src/lib/loadEnv.js'
 import { createClient } from '@sanity/client'
 
 const client = createClient({
@@ -10,12 +9,12 @@ const client = createClient({
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
-    res.setHeader('Allow', 'GET')
-    return res.status(405).end('Method Not Allowed')
+    res.setHeader('Allow', ['GET'])
+    return res.status(405).json({ error: 'Method Not Allowed' })
   }
 
   try {
-    const slugs = await client.fetch(`*[_type=="photo"].eventSlug`)
+    const slugs = await client.fetch(`*[_type == "photo"].eventSlug`)
     const unique = Array.from(new Set(slugs.filter(Boolean)))
     res.status(200).json(unique)
   } catch (err) {

@@ -1,12 +1,13 @@
-// src/api/uploadImages.js
-import '../src/lib/loadEnv.js'
 import formidable from 'formidable'
 import fs from 'fs'
-import { createClient } from '@sanity/client'
 import { basename } from 'path'
+import { createClient } from '@sanity/client'
 
+// Required by Vercel to disable default body parsing
 export const config = {
-  api: { bodyParser: false }, // required for formidable to work
+  api: {
+    bodyParser: false,
+  },
 }
 
 const client = createClient({
@@ -19,8 +20,8 @@ const client = createClient({
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST')
-    return res.status(405).end('Method Not Allowed')
+    res.setHeader('Allow', ['POST'])
+    return res.status(405).json({ error: 'Method Not Allowed' })
   }
 
   const form = formidable({ multiples: true, keepExtensions: true })
@@ -31,15 +32,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Upload error' })
     }
 
-const eventSlug = Array.isArray(fields.eventSlug)
-  ? fields.eventSlug[0]
-  : fields.eventSlug
+    const eventSlug = Array.isArray(fields.eventSlug)
+      ? fields.eventSlug[0]
+      : fields.eventSlug
 
-if (!eventSlug || typeof eventSlug !== 'string') {
-  return res.status(400).json({ error: 'Invalid eventSlug' })
-}
-
-    const uploaded = []
+    if (!eventSlug || typeof eventSlug !== 'string') {
+      return res.status(400).json({ error: 'Invalid eventSlug' })
+    }
 
     const images = files.images
     if (!images) {
@@ -47,13 +46,13 @@ if (!eventSlug || typeof eventSlug !== 'string') {
     }
 
     const fileArray = Array.isArray(images) ? images : [images]
+    const uploaded = []
 
     for (const file of fileArray) {
       if (!file || !file.filepath) continue
 
       try {
         const buffer = fs.readFileSync(file.filepath)
-
         const asset = await client.assets.upload('image', buffer, {
           filename: basename(file.originalFilename),
         })
@@ -70,7 +69,7 @@ if (!eventSlug || typeof eventSlug !== 'string') {
 
         uploaded.push(result._id)
       } catch (e) {
-        console.error(`Error processing ${file.originalFilename}:`, e)
+        console.error(`Error uploading ${file.originalFilename}:`, e)
       }
     }
 

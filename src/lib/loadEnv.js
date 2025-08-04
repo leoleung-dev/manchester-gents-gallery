@@ -1,2 +1,5 @@
-import dotenv from 'dotenv'
-dotenv.config({ path: '.env.local' })
+if (process.env.NODE_ENV !== 'production') {
+  import('dotenv').then(dotenv => {
+    dotenv.config({ path: '.env.local' })
+  })
+}
