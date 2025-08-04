@@ -1,42 +1,9 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import client, { urlFor } from '@/lib/sanityClient'
-import {
-  SelectableGroup,
-  createSelectable,
-} from 'react-selectable-fast'
-import './AdminPanel.css'  // import admin-specific styles
 import Logo from '@/assets/Logo.svg'  // adjust path as needed
-import { FaSyncAlt, FaTrashAlt } from 'react-icons/fa' // refresh and delete icons
-
-// ——— PHOTOS ———
-const SelectablePhoto = createSelectable(
-  ({ selectableRef, isSelected, onClick, photo }) => (
-    <div
-      ref={selectableRef}
-      className={`selectable-photo-wrapper`}
-    >
-      <input
-        type="checkbox"
-        className="admin-photo-checkbox"
-        checked={isSelected}
-        onChange={() => onClick(photo._id)}
-        onClick={e => e.stopPropagation()} // prevent bubbling to parent div click
-        aria-label={`Select photo ${photo._id}`}
-      />
-      <div
-        onClick={() => onClick(photo._id)}
-        className={`selectable-photo ${isSelected ? 'selected' : ''}`}
-      >
-        <img
-          src={urlFor(photo.image).width(400).height(300).fit('crop').url()}
-          alt=""
-          className="selectable-photo-image"
-        />
-      </div>
-    </div>
-  )
-)
+import { FaSyncAlt, FaTrashAlt } from 'react-icons/fa' // icons
+import './AdminPanel.css'
 
 export default function AdminPanel({ apiBase }) {
   const { slug } = useParams()
@@ -46,7 +13,6 @@ export default function AdminPanel({ apiBase }) {
   const [comments, setComments] = useState([])
   const [selectedCommentIds, setSelectedCommentIds] = useState(new Set())
   const [loading, setLoading] = useState(false)
-  const groupRef = useRef(null)
 
   const BASE = apiBase || import.meta.env.VITE_API_BASE || ''
 
@@ -89,21 +55,25 @@ export default function AdminPanel({ apiBase }) {
     return () => window.removeEventListener('focus', loadData)
   }, [loadData])
 
-  // selection helpers
-  const handlePhotoSelectionFinish = items =>
-    setSelectedPhotoIds(new Set(items.map(i => i.props.photo._id)))
-  const togglePhotoSelect = id =>
+  // Toggle photo selection (no drag)
+  const togglePhotoSelect = id => {
     setSelectedPhotoIds(s => {
-      const n = new Set(s)
-      n.has(id) ? n.delete(id) : n.add(id)
-      return n
+      const newSet = new Set(s)
+      if (newSet.has(id)) newSet.delete(id)
+      else newSet.add(id)
+      return newSet
     })
-  const toggleCommentSelect = id =>
+  }
+
+  // Toggle comment selection (checkboxes)
+  const toggleCommentSelect = id => {
     setSelectedCommentIds(s => {
-      const n = new Set(s)
-      n.has(id) ? n.delete(id) : n.add(id)
-      return n
+      const newSet = new Set(s)
+      if (newSet.has(id)) newSet.delete(id)
+      else newSet.add(id)
+      return newSet
     })
+  }
 
   // CTRL+A to select all
   useEffect(() => {
@@ -151,6 +121,7 @@ export default function AdminPanel({ apiBase }) {
       alert('Bulk delete photos failed: ' + err.message)
     } finally { setLoading(false) }
   }
+
   const handleDeletePhoto = async id => {
     if (!confirm('Delete this photo?')) return
     setLoading(true)
@@ -176,6 +147,7 @@ export default function AdminPanel({ apiBase }) {
       alert('Bulk delete comments failed: ' + err.message)
     } finally { setLoading(false) }
   }
+
   const handleDeleteComment = async id => {
     if (!confirm('Delete this comment?')) return
     setLoading(true)
@@ -232,25 +204,48 @@ export default function AdminPanel({ apiBase }) {
           >
             {loading ? 'Deleting…' : `Delete Photos (${selectedPhotoIds.size})`}
           </button>
-          <SelectableGroup
-            ref={groupRef}
-            className="admin-photos-grid"
-            clickClassName="tick"
-            selectionClassName="selection-rectangle"
-            enableDeselect
-            tolerance={0}
-            onSelectionFinish={handlePhotoSelectionFinish}
-            allowClickWithoutSelected
-          >
+          <div className="admin-photos-grid">
             {photos.map(photo => (
-              <SelectablePhoto
+              <div
                 key={photo._id}
-                photo={photo}
-                isSelected={selectedPhotoIds.has(photo._id)}
-                onClick={togglePhotoSelect}
-              />
+                className="selectable-photo-wrapper"
+              >
+                <input
+                  type="checkbox"
+                  className="admin-photo-checkbox"
+                  checked={selectedPhotoIds.has(photo._id)}
+                  onChange={() => togglePhotoSelect(photo._id)}
+                  aria-label={`Select photo ${photo._id}`}
+                />
+                <div
+                  className={`selectable-photo ${selectedPhotoIds.has(photo._id) ? 'selected' : ''}`}
+                  onClick={() => togglePhotoSelect(photo._id)}
+                  tabIndex={0}
+                  role="checkbox"
+                  aria-checked={selectedPhotoIds.has(photo._id)}
+                  onKeyDown={e => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault()
+                      togglePhotoSelect(photo._id)
+                    }
+                  }}
+                >
+                  <img
+                    src={urlFor(photo.image).width(400).height(300).fit('crop').url()}
+                    alt=""
+                    className="selectable-photo-image"
+                  />
+                </div>
+                <button
+                  onClick={() => handleDeletePhoto(photo._id)}
+                  className="btn-delete-single"
+                  aria-label={`Delete photo ${photo._id}`}
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
             ))}
-          </SelectableGroup>
+          </div>
         </>
       ) : (
         <>
