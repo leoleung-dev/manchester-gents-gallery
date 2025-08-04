@@ -1,12 +1,13 @@
 // src/pages/EventGallery.jsx
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { urlFor } from '@/lib/sanityClient'
 import ImageModal from '../components/ImageModal'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import Masonry from 'react-masonry-css'
-import './EventGallery.css'  // make sure you import your CSS
+import './EventGallery.css'
+import Logo from '@/assets/Logo.svg'  // adjust path if needed
 
 export default function EventGallery({ apiBase }) {
   const { slug } = useParams()
@@ -137,7 +138,10 @@ export default function EventGallery({ apiBase }) {
 
   return (
     <div className="event-gallery-container">
-      <header className="event-gallery-header">
+      <header className="header-toolbar">
+        <Link to="/" className="header-logo-link">
+          <img src={Logo} alt="Manchester Gents Logo" className="header-logo" />
+        </Link>
         <h1 className="event-gallery-title">Event: {slug}</h1>
         <div className="event-gallery-buttons">
           <button
@@ -158,15 +162,16 @@ export default function EventGallery({ apiBase }) {
             Refresh
           </button>
         </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
       </header>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        multiple
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
 
       {feedback && (
         <div className={`feedback-message feedback-${feedback.type}`}>

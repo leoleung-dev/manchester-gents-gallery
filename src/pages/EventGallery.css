@@ -80,7 +80,7 @@
 .event-gallery-container {
   max-width: 1024px;
   margin: 0 auto;
-  padding: 2rem 1rem;
+  padding: 2rem 1rem 1rem;
   background-color: #1c2837; /* brand dark background */
   color: #ffd460; /* brand text color */
   min-height: 100vh;
@@ -90,31 +90,54 @@
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Header layout */
-.event-gallery-header {
+/* Header toolbar with logo and buttons */
+.header-toolbar {
+  position: sticky;
+  top: 0;
+  background-color: #1c2837;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+  gap: 1rem;
 }
 
-/* Title styling */
+/* Logo link */
+.header-logo-link {
+  display: flex;
+  align-items: center;
+}
+
+/* Logo image */
+.header-logo {
+  height: 48px;
+  width: auto;
+}
+
+/* Event title */
 .event-gallery-title {
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  margin: 0;
   color: #ffd460;
+  flex-grow: 1;
+  margin: 0 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-/* Button group container */
+/* Buttons container */
 .event-gallery-buttons {
   display: flex;
   gap: 0.75rem;
   flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
-/* Buttons base */
+/* Base button styling */
 button {
   padding: 0.5rem 1rem;
   border-radius: 0.375rem;
@@ -123,6 +146,7 @@ button {
   font-weight: 600;
   font-size: 0.875rem;
   transition: background-color 0.3s ease;
+  white-space: nowrap;
 }
 
 /* Upload button */
@@ -133,6 +157,8 @@ button {
 .btn-upload:hover:not(.btn-disabled) {
   background-color: #3e587b;
 }
+
+/* Disabled button state */
 .btn-disabled {
   opacity: 0.5;
   cursor: not-allowed;
@@ -168,6 +194,8 @@ button:disabled {
   border-radius: 0.375rem;
   font-weight: 600;
   font-size: 0.9rem;
+  max-width: 1024px;
+  margin: 0 auto;
 }
 
 /* Success message */
