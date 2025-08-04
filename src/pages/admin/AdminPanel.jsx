@@ -5,7 +5,7 @@ import {
   SelectableGroup,
   createSelectable,
 } from 'react-selectable-fast'
-import './adminPanel.css'  // import admin-specific styles
+import './AdminPanel.css'  // import admin-specific styles
 
 // ——— PHOTOS ———
 const SelectablePhoto = createSelectable(
