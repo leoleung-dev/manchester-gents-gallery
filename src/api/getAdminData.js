@@ -1,5 +1,5 @@
 // src/api/getAdminData.js
-import client from '../lib/sanity'
+import client from '../lib/sanityClient'
 
 export default async function handler(req, res) {
   const { slug } = req.query

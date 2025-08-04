@@ -1,7 +1,7 @@
 // src/pages/admin/AdminPanel.jsx
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import client, { urlFor } from '@/lib/sanity'
+import client, { urlFor } from '@/lib/sanityClient'
 import {
   SelectableGroup,
   createSelectable,

@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { urlFor } from '@/lib/sanity'
+import { urlFor } from '@/lib/sanityClient'
 import Masonry from 'react-masonry-css'
 import ImageModal from '../components/ImageModal'
 import JSZip from 'jszip'
