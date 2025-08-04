@@ -4,6 +4,7 @@ import { urlFor } from '@/lib/sanityClient'
 import ImageModal from '../components/ImageModal'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
+import Masonry from 'react-masonry-css'
 
 export default function EventGallery({ apiBase }) {
   const { slug } = useParams()
@@ -179,13 +180,17 @@ export default function EventGallery({ apiBase }) {
       )}
 
       {/* Masonry Layout */}
-<div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
+<Masonry
+  breakpointCols={{ default: 3, 768: 2, 500: 1 }}
+  className="flex w-auto gap-4"
+  columnClassName="masonry-column"
+>
   {photos.map(photo => {
     const isSel = selectedIds.has(photo._id)
     return (
       <div
         key={photo._id}
-        className="break-inside-avoid overflow-hidden rounded shadow relative group"
+        className="mb-4 break-inside-avoid relative group"
       >
         <input
           type="checkbox"
@@ -199,7 +204,9 @@ export default function EventGallery({ apiBase }) {
               ? toggleSelect(photo._id)
               : setSelectedPhoto(photo)
           }
-          className={`${isSel ? 'ring-4 ring-green-400' : ''}`}
+          className={`overflow-hidden rounded shadow cursor-pointer ${
+            isSel ? 'ring-4 ring-green-400' : ''
+          }`}
         >
           <img
             src={photo.thumbnailUrl}
@@ -213,7 +220,7 @@ export default function EventGallery({ apiBase }) {
       </div>
     )
   })}
-</div>
+</Masonry>
 
       {selectedPhoto && (
         <ImageModal

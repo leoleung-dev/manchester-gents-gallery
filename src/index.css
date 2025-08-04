@@ -8,3 +8,7 @@
   background-color: rgba(255, 212, 96, 0.2);
   pointer-events: none;
 }
+
+.masonry-column {
+  background-clip: padding-box;
+}
