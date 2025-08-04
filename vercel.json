@@ -12,6 +12,17 @@
     }
   ],
   "routes": [
+    {
+      "src": "/event/(?<slug>[^/]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i)(bot|crawl|spider|slack|facebook|discord|whatsapp|opengraph|twitterbot)"
+        }
+      ],
+      "dest": "/api/seo?slug=$slug"
+    },
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
