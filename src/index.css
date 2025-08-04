@@ -9,20 +9,17 @@
   pointer-events: none;
 }
 
-.masonry-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem; /* or whatever spacing you want between images */
-  background-clip: padding-box;
-}
-
 .masonry-grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
   display: flex;
   margin-left: -1rem; /* gutter size offset */
   width: auto;
 }
-
-.masonry-grid > .masonry-column {
+.masonry-column {
   padding-left: 1rem; /* gutter size */
   background-clip: padding-box;
+}
+.masonry-column > div {
+  margin-bottom: 1rem;
 }
