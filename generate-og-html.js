@@ -30,8 +30,8 @@ async function run() {
     <meta charset="UTF-8" />
     <title>Manchester Gents | ${event.title}</title>
 
-    <meta property="og:title" content="Manchester Gents Event Gallery" />
-    <meta property="og:description" content="View photos from: ${event.title}" />
+    <meta property="og:title" content="Manchester Gents | View photos from: ${event.title}" />
+    <meta property="og:description" content="See all the best shots from ${event.title}!" />
     <meta property="og:image" content="https://mg-og-generator.vercel.app/api/og?slug=${event.slug}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://photos.manchestergents.com/event/${event.slug}" />
