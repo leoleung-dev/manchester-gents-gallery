@@ -97,6 +97,7 @@ export default function EventGallery({ apiBase }) {
     setUploading(true);
     setFeedback(null);
     try {
+      console.log("Uploading:", files[0].name, files[0].size);
       const form = new FormData();
       form.append("file", files[0]); // only send 1 image for now
       form.append("eventSlug", slug);
