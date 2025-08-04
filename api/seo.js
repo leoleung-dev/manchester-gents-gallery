@@ -1,3 +1,12 @@
+import { createClient } from '@sanity/client';
+
+const sanity = createClient({
+  projectId: 'ulu3s1tc',
+  dataset: 'production',
+  apiVersion: '2023-08-03',
+  useCdn: true,
+});
+
 export const config = {
   runtime: 'edge',
 };
@@ -5,11 +14,21 @@ export const config = {
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get('slug');
+  if (!slug) return new Response('Missing slug', { status: 400 });
 
-  const ogImageUrl = `https://photos.manchestergents.com/api/og?slug=${slug}`;
+  const event = await sanity.fetch(
+    `*[_type == "event" && slug.current == $slug][0]{ title, defaultCoverImage }`,
+    { slug }
+  );
+
+  const title = event?.title || slug;
+  const imageUrl = event?.defaultCoverImage?.asset
+    ? `https://cdn.sanity.io/images/ulu3s1tc/production/${event.defaultCoverImage.asset._ref
+        .replace('image-', '')
+        .replace('-jpg', '.jpg')}`
+    : 'https://photos.manchestergents.com/default-og.png';
+
   const pageUrl = `https://photos.manchestergents.com/event/${slug}`;
-  const title = `MG | ${slug}`;
-  const description = `Manchester Gents Gallery | View photos from ${slug}`;
 
   const html = `
     <!DOCTYPE html>
@@ -17,9 +36,9 @@ export default async function handler(req) {
     <head>
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <meta property="og:title" content="${title}" />
-      <meta property="og:description" content="${description}" />
-      <meta property="og:image" content="${ogImageUrl}" />
+      <meta property="og:title" content="MG | ${title}" />
+      <meta property="og:description" content="Manchester Gents Gallery | View photos from ${title}" />
+      <meta property="og:image" content="${imageUrl}" />
       <meta property="og:type" content="website" />
       <meta property="og:url" content="${pageUrl}" />
       <title>${title}</title>
