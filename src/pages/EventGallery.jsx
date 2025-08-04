@@ -1,7 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { urlFor } from '@/lib/sanityClient'
-import Masonry from 'react-masonry-css'
 import ImageModal from '../components/ImageModal'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
@@ -29,6 +28,9 @@ export default function EventGallery({ apiBase }) {
           thumbnailUrl: urlFor(p.image).width(400).auto('format').url(),
           url: urlFor(p.image).width(1000).auto('format').url(),
           originalUrl: urlFor(p.image).url(),
+          dateTaken: p.exifDate
+            ? new Date(p.exifDate.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3'))
+            : new Date(p._createdAt),
         }))
       )
 
@@ -126,6 +128,23 @@ export default function EventGallery({ apiBase }) {
     currentIndex > 0 &&
     setSelectedPhoto(photos[currentIndex - 1])
 
+  const getColumns = (items, columnCount) => {
+    const cols = Array.from({ length: columnCount }, () => [])
+    items.forEach((item, i) => {
+      cols[i % columnCount].push(item)
+    })
+    return cols
+  }
+
+  const getColumnCount = () => {
+    const width = window.innerWidth
+    if (width < 500) return 1
+    if (width < 768) return 2
+    return 3
+  }
+
+  const columns = getColumns(photos, getColumnCount())
+
   return (
     <div className="relative max-w-6xl mx-auto p-4">
       <header className="flex flex-wrap justify-between items-center mb-4 gap-2">
@@ -178,47 +197,43 @@ export default function EventGallery({ apiBase }) {
         </div>
       )}
 
-      <div className="relative">
-        {uploading && (
-          <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center z-10">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-t-4 border-blue-600" />
-          </div>
-        )}
-        <Masonry
-          breakpointCols={{ default: 3, 768: 2, 500: 1 }}
-          className="flex gap-4"
-          columnClassName="flex flex-col gap-4"
-        >
-          {photos.map(photo => {
-            const isSel = selectedIds.has(photo._id)
-            return (
-              <div key={photo._id} className="relative group">
-                <input
-                  type="checkbox"
-                  className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
-                  checked={isSel}
-                  onChange={() => toggleSelect(photo._id)}
-                />
-                <div
-                  onClick={() =>
-                    selectedIds.size > 0
-                      ? toggleSelect(photo._id)
-                      : setSelectedPhoto(photo)
-                  }
-                  className={`overflow-hidden rounded shadow cursor-pointer ${
-                    isSel ? 'ring-4 ring-green-400' : ''
-                  }`}
-                >
-                  <img
-                    src={photo.thumbnailUrl}
-                    alt=""
-                    className="w-full object-cover hover:opacity-80 transition"
+      <div className="flex gap-4">
+        {columns.map((col, i) => (
+          <div key={i} className="flex flex-col gap-4 flex-1">
+            {col.map(photo => {
+              const isSel = selectedIds.has(photo._id)
+              return (
+                <div key={photo._id} className="relative group">
+                  <input
+                    type="checkbox"
+                    className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
+                    checked={isSel}
+                    onChange={() => toggleSelect(photo._id)}
                   />
+                  <div
+                    onClick={() =>
+                      selectedIds.size > 0
+                        ? toggleSelect(photo._id)
+                        : setSelectedPhoto(photo)
+                    }
+                    className={`overflow-hidden rounded shadow cursor-pointer ${
+                      isSel ? 'ring-4 ring-green-400' : ''
+                    }`}
+                  >
+                    <img
+                      src={photo.thumbnailUrl}
+                      alt=""
+                      className="w-full object-cover hover:opacity-80 transition"
+                    />
+                    <div className="text-xs text-gray-500 px-1 pt-1">
+                      {photo.dateTaken.toLocaleString()}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
-        </Masonry>
+              )
+            })}
+          </div>
+        ))}
       </div>
 
       {selectedPhoto && (
