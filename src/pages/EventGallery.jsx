@@ -179,43 +179,40 @@ export default function EventGallery({ apiBase }) {
       )}
 
       {/* Masonry Layout */}
-      <div className="columns-1 sm:columns-2 md:columns-3 gap-4 space-y-4">
-        {photos.map(photo => {
-          const isSel = selectedIds.has(photo._id)
-          return (
-            <div
-              key={photo._id}
-              className="break-inside-avoid relative group"
-            >
-              <input
-                type="checkbox"
-                className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
-                checked={isSel}
-                onChange={() => toggleSelect(photo._id)}
-              />
-              <div
-                onClick={() =>
-                  selectedIds.size > 0
-                    ? toggleSelect(photo._id)
-                    : setSelectedPhoto(photo)
-                }
-                className={`overflow-hidden rounded shadow cursor-pointer ${
-                  isSel ? 'ring-4 ring-green-400' : ''
-                }`}
-              >
-                <img
-                  src={photo.thumbnailUrl}
-                  alt=""
-                  className="w-full object-cover hover:opacity-80 transition"
-                />
-                <div className="text-xs text-gray-500 px-1 pt-1">
-                  {photo.dateTaken.toLocaleString()}
-                </div>
-              </div>
-            </div>
-          )
-        })}
+<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+  {photos.map(photo => {
+    const isSel = selectedIds.has(photo._id)
+    return (
+      <div key={photo._id} className="relative group">
+        <input
+          type="checkbox"
+          className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
+          checked={isSel}
+          onChange={() => toggleSelect(photo._id)}
+        />
+        <div
+          onClick={() =>
+            selectedIds.size > 0
+              ? toggleSelect(photo._id)
+              : setSelectedPhoto(photo)
+          }
+          className={`overflow-hidden rounded shadow cursor-pointer ${
+            isSel ? 'ring-4 ring-green-400' : ''
+          }`}
+        >
+          <img
+            src={photo.thumbnailUrl}
+            alt=""
+            className="w-full h-auto object-cover hover:opacity-80 transition"
+          />
+          <div className="text-xs text-gray-500 px-1 pt-1">
+            {photo.dateTaken.toLocaleString()}
+          </div>
+        </div>
       </div>
+    )
+  })}
+</div>
 
       {selectedPhoto && (
         <ImageModal
