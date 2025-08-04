@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.selection-rectangle {
+  position: absolute;
+  border: 2px dashed #ffd460;
+  background-color: rgba(255, 212, 96, 0.2);
+  pointer-events: none;
+}
