@@ -1,5 +1,5 @@
 // src/api/uploadImages.js
-import '../lib/loadEnv.js'
+import '../src/lib/loadEnv.js'
 import formidable from 'formidable'
 import fs from 'fs'
 import { createClient } from '@sanity/client'

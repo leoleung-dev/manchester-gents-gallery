@@ -1,4 +1,4 @@
-import '../lib/loadEnv.js'
+import '../src/lib/loadEnv.js'
 import { createClient } from '@sanity/client'
 
 const client = createClient({

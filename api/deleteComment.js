@@ -1,4 +1,4 @@
-import '../lib/loadEnv.js'
+import '../src/lib/loadEnv.js'
 import { createClient } from '@sanity/client'
 
 const client = createClient({
@@ -13,20 +13,18 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   try {
-    const { ids } = req.body
-    if (!Array.isArray(ids) || !ids.length) throw new Error('Missing ids')
+    const { id } = req.body
+    if (!id) throw new Error('Missing id')
 
-    const tx = client.transaction()
-    ids.forEach((cid) => {
-      tx.delete(cid)
-      tx.delete(`drafts.${cid}`)
-    })
-
-    await tx.commit({ retry: 3 })
+    await client
+      .transaction()
+      .delete(id)
+      .delete(`drafts.${id}`)
+      .commit({ retry: 3 })
 
     res.status(200).json({ success: true })
   } catch (err) {
-    console.error('bulkDeleteComment error:', err)
+    console.error('deleteComment error:', err)
     res.status(500).json({ success: false, message: err.message })
   }
 }
