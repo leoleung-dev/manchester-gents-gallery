@@ -251,25 +251,52 @@ button:disabled {
   .event-gallery-container {
     padding: 1rem 0.5rem 1rem;
   }
+
   .header-toolbar {
     flex-wrap: wrap;
     padding: 0.5rem 1rem;
     gap: 0.5rem;
+    justify-content: center;
   }
+
   .event-gallery-title {
-    margin: 0.5rem 0;
-    font-size: 1.25rem;
+    margin: 0.25rem auto;
+    font-size: 1.1rem;
+    text-align: center;
+    flex-basis: 100%;
+    order: 1;
   }
+
+  .header-logo-link {
+    order: 0;
+  }
+
   .event-gallery-buttons {
     width: 100%;
-    justify-content: center;
-    gap: 0.5rem;
+    justify-content: space-between;
+    gap: 0.25rem;
+    order: 2;
   }
+
   button {
-    flex-grow: 1;
-    padding: 0.75rem 1rem;
-    font-size: 1.1rem;
-    width: auto;
+    flex: 1;
+    min-width: 0;
+    padding: 0.75rem;
+    font-size: 1rem;
     height: auto;
+  }
+
+  .btn-download {
+    font-size: 1rem;
+    padding: 0.75rem;
+    gap: 0.25rem;
+  }
+
+  .download-count {
+    top: -4px;
+    right: -4px;
+    font-size: 0.65rem;
+    min-width: 16px;
+    height: 16px;
   }
 }
