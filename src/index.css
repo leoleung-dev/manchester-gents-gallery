@@ -2,22 +2,42 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Global site background and text color */
+body {
+  @apply bg-[#1c2837] text-[#ffd460] font-sans;
+}
+
+/* Custom brand styles */
+.page-bg {
+  @apply bg-[#1c2837] text-[#ffd460];
+}
+
+.event-link {
+  @apply block text-lg font-medium text-[#ffe293] bg-[#2d4059] hover:bg-[#3e587b] px-4 py-3 rounded shadow transition-colors;
+}
+
+/* Generic link styling */
+a {
+  @apply text-[#ffd460] hover:text-[#ffe293] underline transition-colors;
+}
+
+/* Buttons base styling */
+.btn {
+  @apply px-4 py-2 rounded font-semibold cursor-pointer transition-colors;
+}
+
+.btn-primary {
+  @apply bg-[#2d4059] text-[#ffd460] hover:bg-[#3e587b];
+}
+
+.btn-danger {
+  @apply bg-[#e63946] text-white hover:bg-[#d62828];
+}
+
+/* Selection rectangle for react-selectable-fast */
 .selection-rectangle {
   position: absolute;
   border: 2px dashed #ffd460;
   background-color: rgba(255, 212, 96, 0.2);
   pointer-events: none;
-}
-
-.masonry-grid {
-  display: flex;
-  margin-left: -0.5rem;
-  width: auto;
-}
-.masonry-column {
-  padding-left: 0.5rem;
-  background-clip: padding-box;
-}
-.masonry-column > div {
-  margin-bottom: 0.5rem;
 }

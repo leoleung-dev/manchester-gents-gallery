@@ -1,4 +1,3 @@
-// src/pages/admin/AdminPanel.jsx
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import client, { urlFor } from '@/lib/sanityClient'
@@ -6,6 +5,7 @@ import {
   SelectableGroup,
   createSelectable,
 } from 'react-selectable-fast'
+import './adminpanel.css'  // import admin-specific styles
 
 // ——— PHOTOS ———
 const SelectablePhoto = createSelectable(
@@ -13,19 +13,15 @@ const SelectablePhoto = createSelectable(
     <div
       ref={selectableRef}
       onClick={() => onClick(photo._id)}
-      className="relative group"
-      style={{
-        opacity: isSelected ? 0.6 : 1,
-        border: isSelected ? '2px solid #ffd460' : 'none',
-      }}
+      className={`selectable-photo ${isSelected ? 'selected' : ''}`}
     >
       <img
         src={urlFor(photo.image).width(400).height(300).fit('crop').url()}
         alt=""
-        className="w-full h-40 object-cover rounded"
+        className="selectable-photo-image"
       />
       {isSelected && (
-        <div className="absolute inset-0 bg-yellow-400 bg-opacity-30 pointer-events-none rounded" />
+        <div className="selectable-photo-overlay" />
       )}
     </div>
   )
@@ -43,49 +39,46 @@ export default function AdminPanel({ apiBase }) {
 
   const BASE = apiBase || import.meta.env.VITE_API_BASE || ''
 
-  // Combined load function
-const loadData = useCallback(async () => {
-  try {
-    const [fetchedPhotos, fetchedComments] = await Promise.all([
-      client.fetch(
-        `*[_type=="photo" && eventSlug==$slug]{
-           _id, image, takenAt, _createdAt
-         } | order(takenAt desc)`,
-        { slug }
-      ),
-      client.fetch(
-        `*[_type=="comment" && photo->eventSlug==$slug]{
-           _id, name, instagram, message, createdAt, photo->{image}
-         } | order(createdAt desc)`,
-        { slug }
-      ),
-    ])
-    setPhotos(
-      fetchedPhotos.map(p => ({
-        ...p,
-        dateTaken: new Date(p.takenAt || p._createdAt),
-      }))
-    )
-    setComments(fetchedComments)
-    setSelectedPhotoIds(new Set())
-    setSelectedCommentIds(new Set())
-  } catch (err) {
-    console.error('loadData error:', err)
-  }
-}, [slug])
+  const loadData = useCallback(async () => {
+    try {
+      const [fetchedPhotos, fetchedComments] = await Promise.all([
+        client.fetch(
+          `*[_type=="photo" && eventSlug==$slug]{
+             _id, image, takenAt, _createdAt
+           } | order(takenAt desc)`,
+          { slug }
+        ),
+        client.fetch(
+          `*[_type=="comment" && photo->eventSlug==$slug]{
+             _id, name, instagram, message, createdAt, photo->{image}
+           } | order(createdAt desc)`,
+          { slug }
+        ),
+      ])
+      setPhotos(
+        fetchedPhotos.map(p => ({
+          ...p,
+          dateTaken: new Date(p.takenAt || p._createdAt),
+        }))
+      )
+      setComments(fetchedComments)
+      setSelectedPhotoIds(new Set())
+      setSelectedCommentIds(new Set())
+    } catch (err) {
+      console.error('loadData error:', err)
+    }
+  }, [slug])
 
-  // initial & slug-change load
   useEffect(() => {
     loadData()
   }, [loadData])
 
-  // re-fetch on window focus
   useEffect(() => {
     window.addEventListener('focus', loadData)
     return () => window.removeEventListener('focus', loadData)
   }, [loadData])
 
-  // selection helpers...
+  // selection helpers
   const handlePhotoSelectionFinish = items =>
     setSelectedPhotoIds(new Set(items.map(i => i.props.photo._id)))
   const togglePhotoSelect = id =>
@@ -117,7 +110,6 @@ const loadData = useCallback(async () => {
     return () => window.removeEventListener('keydown', onKey)
   }, [activeTab, photos, comments])
 
-  // helper to POST JSON and throw on bad status
   async function postJson(path, body) {
     const res = await fetch(`${BASE}/api/${path}`, {
       method: 'POST',
@@ -135,7 +127,7 @@ const loadData = useCallback(async () => {
     return res.json()
   }
 
-  // bulk & single delete handlers
+  // Bulk and single deletes
   const handleBulkDeletePhotos = async () => {
     if (!selectedPhotoIds.size || !confirm(`Delete ${selectedPhotoIds.size} photo(s)?`)) return
     setLoading(true)
@@ -187,38 +179,25 @@ const loadData = useCallback(async () => {
   }
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">Admin: {slug}</h1>
-        <div className="flex items-center gap-2">
-          <nav className="space-x-2">
+    <div className="admin-panel-container">
+      <header className="admin-panel-header">
+        <h1 className="admin-panel-title">Admin: {slug}</h1>
+        <div className="admin-panel-controls">
+          <nav className="admin-panel-nav">
             <button
               onClick={() => setActiveTab('photos')}
-              className={`px-3 py-1 rounded ${
-                activeTab === 'photos'
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-200'
-              }`}
+              className={`admin-panel-tab ${activeTab === 'photos' ? 'active' : ''}`}
             >
               Photos
             </button>
             <button
               onClick={() => setActiveTab('comments')}
-              className={`px-3 py-1 rounded ${
-                activeTab === 'comments'
-                  ? 'bg-gray-800 text-white'
-                  : 'bg-gray-200'
-              }`}
+              className={`admin-panel-tab ${activeTab === 'comments' ? 'active' : ''}`}
             >
               Comments
             </button>
           </nav>
-          {/* Refresh button */}
-          <button
-            onClick={loadData}
-            className="px-3 py-1 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
-          >
+          <button onClick={loadData} className="btn-refresh">
             Refresh
           </button>
         </div>
@@ -226,20 +205,18 @@ const loadData = useCallback(async () => {
 
       {activeTab === 'photos' ? (
         <>
-          {/* Bulk Delete Photos */}
-          <div className="flex justify-end mb-4">
+          <div className="bulk-delete-container">
             <button
               onClick={handleBulkDeletePhotos}
               disabled={loading || !selectedPhotoIds.size}
-              className="bg-red-600 text-white px-3 py-1 rounded disabled:opacity-50"
+              className="btn-delete"
             >
               {loading ? 'Deleting…' : `Delete Photos (${selectedPhotoIds.size})`}
             </button>
           </div>
-          {/* Photo Grid */}
           <SelectableGroup
             ref={groupRef}
-            className="grid grid-cols-4 sm:grid-cols-3 xs:grid-cols-2 gap-4"
+            className="photo-grid"
             clickClassName="tick"
             selectionClassName="selection-rectangle"
             enableDeselect
@@ -248,7 +225,7 @@ const loadData = useCallback(async () => {
             allowClickWithoutSelected
           >
             {photos.map(photo => (
-              <div key={photo._id} className="relative group">
+              <div key={photo._id} className="photo-grid-item group">
                 <SelectablePhoto
                   photo={photo}
                   isSelected={selectedPhotoIds.has(photo._id)}
@@ -256,7 +233,7 @@ const loadData = useCallback(async () => {
                 />
                 <button
                   onClick={() => handleDeletePhoto(photo._id)}
-                  className="absolute top-2 right-2 text-white bg-red-600 bg-opacity-80 p-1 rounded opacity-0 group-hover:opacity-100 transition"
+                  className="btn-delete-single"
                 >
                   Delete
                 </button>
@@ -266,22 +243,20 @@ const loadData = useCallback(async () => {
         </>
       ) : (
         <>
-          {/* Bulk Delete Comments */}
-          <div className="flex justify-end mb-4">
+          <div className="bulk-delete-container">
             <button
               onClick={handleBulkDeleteComments}
               disabled={loading || !selectedCommentIds.size}
-              className="bg-red-600 text-white px-3 py-1 rounded disabled:opacity-50"
+              className="btn-delete"
             >
               {loading ? 'Deleting…' : `Delete Comments (${selectedCommentIds.size})`}
             </button>
           </div>
-          {/* Comments List */}
-          <div className="space-y-4">
+          <div className="comment-list">
             {comments.map(c => {
               const sel = selectedCommentIds.has(c._id)
               return (
-                <div key={c._id} className="flex items-start gap-4 border p-3 rounded">
+                <div key={c._id} className="comment-item">
                   <input
                     type="checkbox"
                     checked={sel}
@@ -290,23 +265,21 @@ const loadData = useCallback(async () => {
                   <img
                     src={urlFor(c.photo.image).width(80).height(80).fit('crop').url()}
                     alt=""
-                    className="w-20 h-20 object-cover rounded"
+                    className="comment-photo"
                   />
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <span className="font-medium">{c.name}</span>{' '}
-                        <span className="text-gray-500">({c.instagram})</span>
-                      </div>
+                  <div className="comment-content">
+                    <div className="comment-header">
+                      <span className="comment-name">{c.name}</span>{' '}
+                      <span className="comment-instagram">({c.instagram})</span>
                       <button
                         onClick={() => handleDeleteComment(c._id)}
-                        className="text-red-600 text-sm"
+                        className="btn-delete-comment"
                       >
                         Delete
                       </button>
                     </div>
-                    <p className="mt-1 text-sm">{c.message}</p>
-                    <p className="mt-1 text-xs text-gray-400">
+                    <p className="comment-message">{c.message}</p>
+                    <p className="comment-date">
                       {new Date(c.createdAt).toLocaleString()}
                     </p>
                   </div>

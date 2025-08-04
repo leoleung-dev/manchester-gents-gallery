@@ -6,6 +6,7 @@ import ImageModal from '../components/ImageModal'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import Masonry from 'react-masonry-css'
+import './EventGallery.css'  // make sure you import your CSS
 
 export default function EventGallery({ apiBase }) {
   const { slug } = useParams()
@@ -128,112 +129,95 @@ export default function EventGallery({ apiBase }) {
     currentIndex > 0 &&
     setSelectedPhoto(photos[currentIndex - 1])
 
-const breakpointColumnsObj = {
-  default: 3,
-  768: 2,
-  480: 2,
-}
+  const breakpointColumnsObj = {
+    default: 3,
+    768: 2,
+    480: 1,
+  }
 
-return (
-  <div className="relative max-w-6xl mx-auto p-4">
-    <header className="flex flex-wrap justify-between items-center mb-4 gap-2">
-      <h1 className="text-2xl font-bold">Event: {slug}</h1>
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={() => fileInputRef.current.click()}
-          disabled={uploading}
-          className={`px-4 py-2 rounded text-white ${
-            uploading ? 'bg-gray-500' : 'bg-blue-600 hover:bg-blue-700'
-          }`}
-        >
-          {uploading ? 'Uploading…' : 'Upload Images'}
-        </button>
-        <button
-          onClick={handleDownloadSelected}
-          disabled={!selectedIds.size}
-          className="px-4 py-2 rounded bg-green-600 text-white disabled:opacity-50"
-        >
-          Download Selected ({selectedIds.size})
-        </button>
-        <button
-          onClick={loadPhotos}
-          className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 text-gray-800"
-        >
-          Refresh
-        </button>
-      </div>
-      <input
-        ref={fileInputRef}
-        type="file"
-        multiple
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChange}
-      />
-    </header>
+  return (
+    <div className="event-gallery-container">
+      <header className="event-gallery-header">
+        <h1 className="event-gallery-title">Event: {slug}</h1>
+        <div className="event-gallery-buttons">
+          <button
+            onClick={() => fileInputRef.current.click()}
+            disabled={uploading}
+            className={`btn-upload ${uploading ? 'btn-disabled' : ''}`}
+          >
+            {uploading ? 'Uploading…' : 'Upload Images'}
+          </button>
+          <button
+            onClick={handleDownloadSelected}
+            disabled={!selectedIds.size}
+            className="btn-download"
+          >
+            Download Selected ({selectedIds.size})
+          </button>
+          <button onClick={loadPhotos} className="btn-refresh">
+            Refresh
+          </button>
+        </div>
+        <input
+          ref={fileInputRef}
+          type="file"
+          multiple
+          accept="image/*"
+          className="hidden"
+          onChange={handleFileChange}
+        />
+      </header>
 
-    {feedback && (
-      <div
-        className={`mb-4 p-2 rounded text-sm ${
-          feedback.type === 'success'
-            ? 'bg-green-100 text-green-800'
-            : feedback.type === 'error'
-            ? 'bg-red-100 text-red-800'
-            : 'bg-blue-100 text-blue-800'
-        }`}
+      {feedback && (
+        <div className={`feedback-message feedback-${feedback.type}`}>
+          {feedback.message}
+        </div>
+      )}
+
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="masonry-grid"
+        columnClassName="masonry-column"
       >
-        {feedback.message}
-      </div>
-    )}
-
-    <Masonry
-      breakpointCols={breakpointColumnsObj}
-      className="masonry-grid"
-      columnClassName="masonry-column"
-    >
-      {photos.map(photo => {
-        const isSel = selectedIds.has(photo._id)
-        return (
-          <div key={photo._id} className="relative group mb-4">
-            <input
-              type="checkbox"
-              className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
-              checked={isSel}
-              onChange={() => toggleSelect(photo._id)}
-            />
-            <div
-              onClick={() =>
-                selectedIds.size > 0
-                  ? toggleSelect(photo._id)
-                  : setSelectedPhoto(photo)
-              }
-              className={`overflow-hidden rounded shadow cursor-pointer ${
-                isSel ? 'ring-4 ring-green-400' : ''
-              }`}
-            >
-              <img
-                src={photo.thumbnailUrl}
-                alt=""
-                className="w-full object-cover hover:opacity-80 transition"
+        {photos.map(photo => {
+          const isSel = selectedIds.has(photo._id)
+          return (
+            <div key={photo._id} className="photo-card">
+              <input
+                type="checkbox"
+                className="photo-checkbox"
+                checked={isSel}
+                onChange={() => toggleSelect(photo._id)}
               />
-              <div className="text-xs text-gray-500 px-1 pt-1">
-                {photo.dateTaken.toLocaleString()}
+              <div
+                onClick={() =>
+                  selectedIds.size > 0
+                    ? toggleSelect(photo._id)
+                    : setSelectedPhoto(photo)
+                }
+                className={`photo-image-container ${isSel ? 'photo-selected' : ''}`}
+              >
+                <img
+                  src={photo.thumbnailUrl}
+                  alt=""
+                  className="photo-image"
+                />
+                <div className="photo-date">{photo.dateTaken.toLocaleString()}</div>
               </div>
             </div>
-          </div>
-        )
-      })}
-    </Masonry>
+          )
+        })}
+      </Masonry>
 
-    {selectedPhoto && (
-      <ImageModal
-        photo={selectedPhoto}
-        onClose={() => setSelectedPhoto(null)}
-        onNext={handleNext}
-        onPrev={handlePrev}
-        apiBase={API}
-      />
-    )}
-  </div>
-)
+      {selectedPhoto && (
+        <ImageModal
+          photo={selectedPhoto}
+          onClose={() => setSelectedPhoto(null)}
+          onNext={handleNext}
+          onPrev={handlePrev}
+          apiBase={API}
+        />
+      )}
+    </div>
+  )
 }
