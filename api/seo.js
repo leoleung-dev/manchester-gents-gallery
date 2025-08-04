@@ -35,6 +35,7 @@ export default async function handler(req) {
     <!DOCTYPE html>
     <html lang="en">
     <head>
+      <!-- ✅ HIT SEO API -->
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta property="og:title" content="MG | ${title}" />
