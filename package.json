@@ -10,6 +10,7 @@
   "dependencies": {
     "@sanity/client": "^5.4.2",
     "@sanity/image-url": "^1.0.1",
+    "@vercel/og": "^0.8.5",
     "busboy": "^1.6.0",
     "dotenv": "^17.2.1",
     "exifr": "^7.1.3",
