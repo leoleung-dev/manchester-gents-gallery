@@ -101,7 +101,7 @@ export default function EventGallery({ apiBase }) {
       form.append("file", files[0]); // only send 1 image for now
       form.append("eventSlug", slug);
 
-      const res = await fetch(`${API}/api/uploadImages`, {
+      const res = await fetch(`https://manchestergents-uploadserver.up.railway.app/upload`, {
         method: "POST",
         body: form,
       });
