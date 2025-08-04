@@ -4,8 +4,10 @@ export default function Admin() {
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
   const [createStatus, setCreateStatus] = useState(null);
-  const [ogStatus, setOgStatus] = useState(null);
+  const [deployStatus, setDeployStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  const deployUrl = import.meta.env.VITE_VERCEL_DEPLOY_HOOK;
 
   const handleCreateEvent = async () => {
     if (!title || !slug) {
@@ -30,18 +32,25 @@ export default function Admin() {
     }
   };
 
-  const handleRegenerateOG = async () => {
+  const handleTriggerDeploy = async () => {
+    if (!deployUrl) {
+      setDeployStatus({ error: "Deploy hook URL is missing!" });
+      return;
+    }
+
     setLoading(true);
-    setOgStatus(null);
+    setDeployStatus(null);
 
     try {
-      const res = await fetch("/api/generateOgHtml", {
-        method: "POST",
-      });
-      const data = await res.json();
-      setOgStatus(data);
+      const res = await fetch(deployUrl, { method: "POST" });
+      if (res.ok) {
+        setDeployStatus({ success: true, message: "Deploy triggered successfully." });
+      } else {
+        const err = await res.json();
+        setDeployStatus({ error: true, details: err });
+      }
     } catch (err) {
-      setOgStatus({ error: "OG generation failed" });
+      setDeployStatus({ error: "Failed to trigger deploy." });
     } finally {
       setLoading(false);
     }
@@ -107,9 +116,9 @@ export default function Admin() {
       </section>
 
       <section>
-        <h2>🔄 Regenerate All OG HTML</h2>
+        <h2>🔄 Trigger Vercel Build (OG HTML)</h2>
         <button
-          onClick={handleRegenerateOG}
+          onClick={handleTriggerDeploy}
           disabled={loading}
           style={{
             padding: "1rem 2rem",
@@ -121,10 +130,10 @@ export default function Admin() {
             cursor: "pointer",
           }}
         >
-          {loading ? "Generating..." : "Regenerate OG HTML"}
+          {loading ? "Triggering..." : "Trigger Vercel Deploy"}
         </button>
 
-        {ogStatus && (
+        {deployStatus && (
           <pre
             style={{
               marginTop: "1rem",
@@ -135,7 +144,7 @@ export default function Admin() {
               fontSize: "0.9rem",
             }}
           >
-            {JSON.stringify(ogStatus, null, 2)}
+            {JSON.stringify(deployStatus, null, 2)}
           </pre>
         )}
       </section>
