@@ -36,7 +36,7 @@
   z-index: 20;
   height: 1.25rem;
   width: 1.25rem;
-  accent-color: #22c55e; /* Tailwind green-600 */
+  accent-color: #ffd460; /* Brand primary yellow */
 }
 
 /* Photo image container */
@@ -49,7 +49,7 @@
 }
 
 .photo-image-container.photo-selected {
-  box-shadow: 0 0 0 3px #22c55e; /* highlight selected */
+  box-shadow: 0 0 0 3px #ffd460; /* brand yellow highlight */
 }
 
 .photo-image-container:hover {
@@ -72,6 +72,118 @@
 /* Date text */
 .photo-date {
   font-size: 0.75rem; /* text-xs */
-  color: #6b7280; /* gray-500 */
+  color: #ffd460; /* brand yellow for date */
   padding: 0.25rem 0.25rem 0 0.25rem;
+}
+
+/* Container for entire gallery page */
+.event-gallery-container {
+  max-width: 1024px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  background-color: #1c2837; /* brand dark background */
+  color: #ffd460; /* brand text color */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Header layout */
+.event-gallery-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Title styling */
+.event-gallery-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin: 0;
+  color: #ffd460;
+}
+
+/* Button group container */
+.event-gallery-buttons {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* Buttons base */
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: background-color 0.3s ease;
+}
+
+/* Upload button */
+.btn-upload {
+  background-color: #2d4059;
+  color: #ffd460;
+}
+.btn-upload:hover:not(.btn-disabled) {
+  background-color: #3e587b;
+}
+.btn-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Download button */
+.btn-download {
+  background-color: #ffd460;
+  color: #1c2837;
+}
+.btn-download:hover:not(:disabled) {
+  background-color: #ffc62d;
+}
+
+/* Refresh button */
+.btn-refresh {
+  background-color: #3e587b;
+  color: #ffd460;
+}
+.btn-refresh:hover {
+  background-color: #2d4059;
+}
+
+/* Disabled button */
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Feedback message styles */
+.feedback-message {
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Success message */
+.feedback-success {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+/* Error message */
+.feedback-error {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+/* Info message */
+.feedback-info {
+  background-color: #dbeafe;
+  color: #1e40af;
 }
