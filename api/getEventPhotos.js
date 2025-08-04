@@ -24,7 +24,7 @@ export default async function handler(req, res) {
     // Sort by takenAt (EXIF-based) with fallback to createdAt
     const photos = await client.fetch(
       `*[_type == "photo" && eventSlug == $slug] 
-        | order(coalesce(takenAt, _createdAt) asc) {
+        | order(coalesce(takenAt, _createdAt) desc) {
           _id,
           image,
           takenAt,
