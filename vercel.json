@@ -18,16 +18,20 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": "(?i)(facebookexternalhit|bot|crawl|spider|slack|discord|twitterbot|whatsapp|linkedin|opengraph)"
+          "value": "(?i)(bot|crawl|spider|slack|facebook|discord|whatsapp|opengraph|twitterbot)"
         }
       ],
       "dest": "/event/$slug/index.html"
+    },
+    { "handle": "filesystem" },
+    {
+      "src": "/event/(?<slug>[^/]+)",
+      "dest": "/index.html"
     },
     {
       "src": "/api/(.*)",
       "dest": "/api/$1.js"
     },
-    { "handle": "filesystem" },
     {
       "src": "/(.*)",
       "dest": "/index.html"
