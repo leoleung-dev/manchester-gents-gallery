@@ -98,7 +98,7 @@ export default function EventGallery({ apiBase }) {
     setFeedback(null);
     try {
       const form = new FormData();
-      files.forEach((f) => form.append("images", f));
+      form.append("file", files[0]); // only send 1 image for now
       form.append("eventSlug", slug);
 
       const res = await fetch(`${API}/api/uploadImages`, {
