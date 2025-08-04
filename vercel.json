@@ -23,7 +23,9 @@
       ],
       "dest": "/event/$slug/index.html"
     },
-    { "handle": "filesystem" },
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/event/(?<slug>[^/]+)",
       "dest": "/index.html"
