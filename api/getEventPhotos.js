@@ -21,29 +21,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Fetch photos with EXIF and createdAt
+    // Sort by takenAt (EXIF-based) with fallback to createdAt
     const photos = await client.fetch(
-      `*[_type == "photo" && eventSlug == $slug]{
-        _id,
-        image,
-        _createdAt,
-        "exifDate": image.asset->metadata.exif.DateTimeOriginal
-      }`,
+      `*[_type == "photo" && eventSlug == $slug] 
+        | order(coalesce(takenAt, _createdAt) asc) {
+          _id,
+          image,
+          takenAt,
+          _createdAt
+        }`,
       { slug }
     )
 
-    // Sort by EXIF date if available, else by _createdAt
-    const sorted = photos.sort((a, b) => {
-      const parseExif = str =>
-        str ? new Date(str.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3')) : null
-
-      const aDate = parseExif(a.exifDate) || new Date(a._createdAt)
-      const bDate = parseExif(b.exifDate) || new Date(b._createdAt)
-
-      return aDate - bDate // oldest first
-    })
-
-    res.status(200).json(sorted)
+    res.status(200).json(photos)
   } catch (err) {
     console.error('getEventPhotos error:', err)
     res.status(500).json({ error: err.message })
