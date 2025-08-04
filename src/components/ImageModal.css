@@ -1,3 +1,4 @@
+/* Modal overlay */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -9,17 +10,33 @@
   z-index: 50;
 }
 
-.modal-close-btn {
+/* Close button */
+.modal-close-btn-container {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
+  top: -2rem;
+  right: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.modal-close-btn {
+  background-color: #1c2837;
   color: #ffd460;
-  font-size: 1.5rem;
-  background: none;
+  font-size: 1.25rem;
   border: none;
+  border-radius: 9999px;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 2px #ffd46066;
   cursor: pointer;
 }
 
+/* Modal image container */
 .modal-content {
   position: relative;
   display: flex;
@@ -29,6 +46,7 @@
   max-width: 900px;
 }
 
+/* Navigation buttons */
 .modal-nav-btn {
   position: absolute;
   top: 50%;
@@ -53,6 +71,7 @@
   right: 0.5rem;
 }
 
+/* Image style */
 .modal-image {
   max-height: 80vh;
   border-radius: 0.5rem;
@@ -60,36 +79,37 @@
   user-select: none;
 }
 
+/* Action buttons (Download / Comment) */
 .modal-actions {
   margin-top: 1rem;
   display: flex;
   gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .btn {
-  padding: 0.5rem 1.5rem;
-  border-radius: 0.375rem;
-  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  border-radius: 9999px;
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, transform 0.2s;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.btn-primary {
   background-color: #ffd460;
   color: #1c2837;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
 }
 
-.btn-primary:hover:not(:disabled) {
+.btn:hover:not(:disabled) {
   background-color: #ffc62d;
+  transform: translateY(-1px);
 }
 
-.icon {
-  font-size: 1rem;
-}
-
+/* Comments modal overlay */
 .comments-overlay {
   position: fixed;
   inset: 0;
@@ -100,6 +120,7 @@
   z-index: 60;
 }
 
+/* Comments modal box */
 .comments-modal {
   background-color: #1c2837;
   color: #ffd460;
@@ -111,6 +132,7 @@
   position: relative;
 }
 
+/* Close button inside comment modal */
 .comments-close-btn {
   position: absolute;
   top: 0.5rem;
@@ -122,6 +144,7 @@
   cursor: pointer;
 }
 
+/* Comment section */
 .comments-title {
   font-weight: 700;
   margin-bottom: 0.75rem;
@@ -138,6 +161,7 @@
   color: #ffc62d;
 }
 
+/* Each comment item */
 .comment-item {
   border: 1px solid #ffd460;
   padding: 0.5rem;
@@ -157,7 +181,9 @@
   margin-top: 0.25rem;
 }
 
-.comment-form .input-field {
+/* Form fields */
+.comment-form .input-field,
+.comment-form .textarea-field {
   width: 100%;
   padding: 0.4rem 0.5rem;
   margin-bottom: 0.6rem;
@@ -171,6 +197,7 @@
   resize: none;
 }
 
+/* Submit button */
 .submit-btn {
   background-color: #ffd460;
   color: #1c2837;
@@ -181,6 +208,7 @@
   background-color: #ffc62d;
 }
 
+/* Form messages */
 .error-message {
   color: #e63946;
   margin-top: 0.25rem;
