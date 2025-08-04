@@ -307,11 +307,27 @@ button:disabled {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(28, 40, 55, 0.85);
-  color: #ffd460;
-  font-size: 1.5rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  background: rgba(28, 40, 55, 0.9);
   z-index: 999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: #ffd460;
+  font-size: 1.2rem;
+}
+
+.progress-container {
+  width: 80%;
+  max-width: 400px;
+  background-color: #2d4059;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #ffd46060;
+}
+
+.progress-bar {
+  height: 20px;
+  background-color: #ffd460;
+  transition: width 0.3s ease;
 }

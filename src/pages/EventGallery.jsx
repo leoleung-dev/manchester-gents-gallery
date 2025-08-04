@@ -90,52 +90,60 @@ export default function EventGallery({ apiBase }) {
     setTimeout(() => setFeedback(null), 3000);
   };
 
-const handleFileChange = async (e) => {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
+  const handleFileChange = async (e) => {
+    const files = Array.from(e.target.files);
+    if (!files.length) return;
 
-  setUploading(true);
-  setFeedback({ type: "info", message: "Uploading images…" });
+    setUploading(true);
+    setUploadProgress(0);
+    setFeedback({ type: "info", message: "Uploading images…" });
 
-  let successCount = 0;
+    let successCount = 0;
 
-  try {
-    for (const file of files) {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("eventSlug", slug);
+    try {
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const form = new FormData();
+        form.append("file", file);
+        form.append("eventSlug", slug);
 
-      const res = await fetch(
-        "https://manchester-gents-gallery-uploadserver-production.up.railway.app/upload",
-        {
-          method: "POST",
-          body: form,
+        const res = await fetch(
+          "https://manchester-gents-gallery-uploadserver-production.up.railway.app/upload",
+          {
+            method: "POST",
+            body: form,
+          }
+        );
+
+        if (res.ok) {
+          successCount++;
+        } else {
+          const err = await res.json().catch(() => ({}));
+          console.error("Upload error:", err);
         }
-      );
 
-      if (res.ok) {
-        successCount++;
-      } else {
-        const err = await res.json().catch(() => ({}));
-        console.error("Upload error:", err);
+        setUploadProgress(Math.round(((i + 1) / files.length) * 100));
       }
-    }
 
-    if (successCount > 0) {
-      setFeedback({ type: "success", message: `${successCount} image(s) uploaded!` });
-      await loadPhotos();
-    } else {
-      throw new Error("All uploads failed.");
+      if (successCount > 0) {
+        setFeedback({
+          type: "success",
+          message: `${successCount} image(s) uploaded!`,
+        });
+        await loadPhotos();
+      } else {
+        throw new Error("All uploads failed.");
+      }
+    } catch (err) {
+      console.error("Upload error:", err);
+      setFeedback({ type: "error", message: err.message || "Upload failed" });
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+      fileInputRef.current.value = null;
+      setTimeout(() => setFeedback(null), 3000);
     }
-  } catch (err) {
-    console.error("Upload error:", err);
-    setFeedback({ type: "error", message: err.message || "Upload failed" });
-  } finally {
-    setUploading(false);
-    fileInputRef.current.value = null;
-    setTimeout(() => setFeedback(null), 3000);
-  }
-};
+  };
 
   const currentIndex = selectedPhoto
     ? photos.findIndex((p) => p._id === selectedPhoto._id)
@@ -154,6 +162,17 @@ const handleFileChange = async (e) => {
 
   return (
     <div className="event-gallery-container">
+      {uploading && (
+        <div className="loading-overlay">
+          <div className="progress-container">
+            <div
+              className="progress-bar"
+              style={{ width: `${uploadProgress}%` }}
+            />
+            <span>{uploadProgress}%</span>
+          </div>
+        </div>
+      )}
       <header className="header-toolbar">
         <Link to="/" className="header-logo-link">
           <img src={Logo} alt="Manchester Gents Logo" className="header-logo" />
