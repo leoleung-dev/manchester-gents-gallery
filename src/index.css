@@ -2,16 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Ensure the entire page uses brand background and text color */
+html, body, #root {
+  @apply bg-[#1c2837] text-[#ffd460] font-sans min-h-screen m-0 p-0;
+}
+
 /* Global site background and text color */
 body {
   @apply bg-[#1c2837] text-[#ffd460] font-sans;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
 }
 
 /* Custom brand styles */
 .page-bg {
   @apply bg-[#1c2837] text-[#ffd460];
+  min-height: 100vh;
 }
 
+/* Event link styling */
 .event-link {
   @apply block text-lg font-medium text-[#ffe293] bg-[#2d4059] hover:bg-[#3e587b] px-4 py-3 rounded shadow transition-colors;
 }
