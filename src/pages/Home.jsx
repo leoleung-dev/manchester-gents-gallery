@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '@/assets/Logo.svg' // adjust path as needed
@@ -7,7 +6,9 @@ export default function Home({ apiBase }) {
   const [events, setEvents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const API = apiBase || import.meta.env.VITE_API_BASE || ''
+
+  const isLocal = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  const API = isLocal ? '' : (apiBase ?? import.meta.env.VITE_API_BASE ?? '')
 
   useEffect(() => {
     async function fetchEvents() {

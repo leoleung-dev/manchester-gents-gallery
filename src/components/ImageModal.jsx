@@ -12,7 +12,8 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [showComments, setShowComments] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [commentsToShow, setCommentsToShow] = useState(3);
 
   const projectId = import.meta.env.VITE_SANITY_PROJECT_ID;
   const dataset = import.meta.env.VITE_SANITY_DATASET;
@@ -37,6 +38,7 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
         );
         const json = await res.json();
         setComments(json.result || []);
+        setCommentsToShow(3); // reset to default when photo changes
       } catch (err) {
         console.error("Failed to fetch comments", err);
       }
@@ -73,6 +75,7 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
           },
           ...prev,
         ]);
+        setCommentsToShow((count) => count + 1); // Show new comment immediately
       } else {
         throw new Error(result.message || "Failed to add comment");
       }
@@ -104,7 +107,6 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
       tabIndex={-1}
     >
       <div className="modal-content">
-        {/* Close button now inside and always visible */}
         <div className="modal-close-btn-container">
           <button onClick={onClose} className="modal-close-btn" aria-label="Close modal">
             <FaTimes />
@@ -117,59 +119,74 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
 
         <img src={photo.url} alt="Enlarged" className="modal-image" />
 
+        <div className="modal-comment-preview">
+          {comments.length === 0 ? (
+            <p className="no-comments">No comments yet. Be the first!</p>
+          ) : (
+            <>
+              {comments.slice(0, commentsToShow).map((c, i) => (
+                <div key={c._id || `${c.name}-${i}`} className="comment-preview-item">
+                  <p className="comment-author">
+                    {c.name}{" "}
+                    {c.instagram && <span className="comment-instagram">({c.instagram})</span>}
+                  </p>
+                  <p className="comment-message">{c.message}</p>
+                </div>
+              ))}
+              {commentsToShow < comments.length && (
+                <button
+                  className="btn btn-show-more"
+                  onClick={() => setCommentsToShow(commentsToShow + 3)}
+                >
+                  Show More
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
         <button onClick={onNext} className="modal-nav-btn modal-next" aria-label="Next image">
           ›
         </button>
-      </div>
 
-      <div className="modal-actions">
-        <button
-          onClick={async () => {
-            try {
-              const res = await fetch(photo.originalUrl, { mode: "cors" });
-              const blob = await res.blob();
-              const link = document.createElement("a");
-              link.href = URL.createObjectURL(blob);
-              link.download = `${photo._id}.jpg`;
-              document.body.appendChild(link);
-              link.click();
-              document.body.removeChild(link);
-            } catch (err) {
-              console.error("Download failed:", err);
-              alert("Failed to download image. Please try again later.");
-            }
-          }}
-          className="btn btn-primary"
-        >
-          <FaDownload className="icon" /> Download
-        </button>
+        <div className="modal-floating-btns">
+          <button
+            onClick={async () => {
+              try {
+                const res = await fetch(photo.originalUrl, { mode: "cors" });
+                const blob = await res.blob();
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = `${photo._id}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+              } catch (err) {
+                console.error("Download failed:", err);
+                alert("Failed to download image. Please try again later.");
+              }
+            }}
+            className="btn btn-circle download-btn"
+          >
+            <FaDownload />
+          </button>
 
-        <button onClick={() => setShowComments(true)} className="btn btn-primary">
-          <FaCommentDots className="icon" /> Comment
-        </button>
-      </div>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="btn btn-circle comment-btn"
+            aria-label="Add comment"
+          >
+            <FaCommentDots />
+          </button>
+        </div>
 
-      {showComments && (
-        <div className="comments-overlay" role="dialog" aria-modal="true" tabIndex={-1}>
-          <div className="comments-modal">
-            <button onClick={() => setShowComments(false)} className="comments-close-btn" aria-label="Close comments">
-              <FaTimes />
-            </button>
-            <h2 className="comments-title">Comments</h2>
-            <div className="comments-list">
-              {comments.length === 0 ? (
-                <p className="no-comments">No comments yet.</p>
-              ) : (
-                comments.map((c, i) => (
-                  <div key={c._id || `${c.name}-${i}`} className="comment-item">
-                    <p className="comment-author">
-                      {c.name}{" "}
-                      {c.instagram && <span className="comment-instagram">({c.instagram})</span>}
-                    </p>
-                    <p className="comment-message">{c.message}</p>
-                  </div>
-                ))
-              )}
+        {showForm && (
+          <div className="comment-form-popup">
+            <div className="popup-header">
+              <h3 className="popup-title">Add a Comment</h3>
+              <button onClick={() => setShowForm(false)} className="close-btn" aria-label="Close form">
+                <FaTimes />
+              </button>
             </div>
             <form onSubmit={handleSubmit} className="comment-form">
               <input
@@ -196,7 +213,7 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
                 onChange={(e) => setMessage(e.target.value)}
                 required
               />
-              <button type="submit" disabled={loading} className="btn btn-primary submit-btn">
+              <button type="submit" disabled={loading} className="submit-btn">
                 {loading ? "Posting..." : "Post Comment"}
               </button>
               {errorMessage && <p className="error-message">{errorMessage}</p>}
@@ -204,8 +221,8 @@ export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) 
               {success === false && <p className="error-message">Failed to post comment.</p>}
             </form>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

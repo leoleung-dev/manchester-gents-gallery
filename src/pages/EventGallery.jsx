@@ -266,15 +266,18 @@ export default function EventGallery({ apiBase }) {
         })}
       </Masonry>
 
-      {selectedPhoto && (
-        <ImageModal
-          photo={selectedPhoto}
-          onClose={() => setSelectedPhoto(null)}
-          onNext={handleNext}
-          onPrev={handlePrev}
-          apiBase={API}
-        />
-      )}
+{selectedPhoto && (
+  <>
+    <style>{`.header-toolbar { display: none !important; }`}</style>
+    <ImageModal
+      photo={selectedPhoto}
+      onClose={() => setSelectedPhoto(null)}
+      onNext={handleNext}
+      onPrev={handlePrev}
+      apiBase={API}
+    />
+  </>
+)}
     </div>
   );
 }

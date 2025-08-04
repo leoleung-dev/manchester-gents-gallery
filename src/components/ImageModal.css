@@ -4,7 +4,6 @@
   inset: 0;
   background-color: rgba(28, 40, 55, 0.95);
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 50;
@@ -22,14 +21,13 @@
   box-sizing: border-box;
 }
 
-/* Close button now overlays the image */
+/* Close button */
 .modal-close-btn-container {
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
   z-index: 10;
 }
-
 .modal-close-btn {
   background-color: #1c2837;
   color: #ffd460;
@@ -45,7 +43,7 @@
   cursor: pointer;
 }
 
-/* Navigation buttons */
+/* Navigation arrows */
 .modal-nav-btn {
   position: absolute;
   top: 50%;
@@ -71,7 +69,7 @@
   right: 0.5rem;
 }
 
-/* Image style */
+/* Image */
 .modal-image {
   max-height: 80vh;
   border-radius: 0.5rem;
@@ -79,30 +77,85 @@
   user-select: none;
 }
 
-/* Action buttons (Download / Comment) */
-.modal-actions {
-  margin-top: 1rem;
+/* Floating circular buttons */
+.modal-floating-btns {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  flex-direction: row;
+  flex-direction: column;
+  gap: 0.75rem;
+  z-index: 50;
+}
+.btn-circle {
+  background-color: #2d4059;
+  color: #ffd460;
+  border-radius: 9999px;
+  padding: 0.75rem;
+  font-size: 1.25rem;
+  border: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
 }
 
-@media (max-width: 480px) {
-  .modal-actions {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    padding: 0 1rem;
-  }
-
-  .modal-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
+/* Comment preview */
+.modal-comment-preview {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  background: rgba(28, 40, 55, 0.9);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  max-width: 60%;
+  max-height: 30%;
+  overflow-y: auto;
+  font-size: 0.85rem;
+  color: #ffd460;
+}
+.comment-preview-item {
+  margin-bottom: 0.5rem;
 }
 
+/* Popup form */
+.comment-form-popup {
+  position: fixed;
+  bottom: 4rem;
+  right: 1rem;
+  background: #1c2837;
+  border-radius: 1rem;
+  padding: 1.5rem 1rem 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  width: 90%;
+  max-width: 360px;
+  z-index: 100;
+  color: #ffd460;
+  display: flex;
+  flex-direction: column;
+}
+
+.comment-form-popup .popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.comment-form-popup .popup-title {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.comment-form-popup .close-btn {
+  background: none;
+  border: none;
+  color: #ffd460;
+  font-size: 1.25rem;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* Shared button style */
 .btn {
   padding: 0.5rem 1.25rem;
   border-radius: 9999px;
@@ -116,87 +169,47 @@
   background-color: #ffd460;
   color: #1c2837;
   border: none;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
-
 .btn:hover:not(:disabled) {
   background-color: #ffc62d;
   transform: translateY(-1px);
 }
 
-/* Comments modal overlay */
-.comments-overlay {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(28, 40, 55, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 60;
-}
-
-/* Comments modal box */
-.comments-modal {
-  background-color: #1c2837;
-  color: #ffd460;
+/* Submit button */
+.submit-btn {
   width: 100%;
-  max-width: 400px;
-  padding: 1rem 1.5rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 20px rgba(255, 212, 96, 0.5);
-  position: relative;
-}
-
-/* Close button inside comment modal */
-.comments-close-btn {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  background: none;
+  padding: 0.6rem 1rem;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 9999px;
+  background: #ffd460;
+  color: #1c2837;
   border: none;
-  color: #ffd460;
-  font-size: 1.25rem;
-  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s, transform 0.2s;
+  margin-top: 0.5rem;
+}
+.submit-btn:hover:not(:disabled) {
+  background: #ffc62d;
+  transform: translateY(-1px);
 }
 
-/* Comment section */
-.comments-title {
-  font-weight: 700;
-  margin-bottom: 0.75rem;
+/* Responsive */
+@media (max-width: 480px) {
+  .modal-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    padding: 0 1rem;
+  }
+  .modal-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
-.comments-list {
-  max-height: 200px;
-  overflow-y: auto;
-  margin-bottom: 1rem;
-}
-
-.no-comments {
-  font-style: italic;
-  color: #ffc62d;
-}
-
-/* Each comment item */
-.comment-item {
-  border: 1px solid #ffd460;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  margin-bottom: 0.5rem;
-}
-
-.comment-author {
-  font-weight: 600;
-}
-
-.comment-instagram {
-  color: #ffc62d;
-}
-
-.comment-message {
-  margin-top: 0.25rem;
-}
-
-/* Form fields */
+/* Comment form inputs */
 .comment-form .input-field,
 .comment-form .textarea-field {
   width: 100%;
@@ -207,29 +220,67 @@
   border-radius: 0.25rem;
   color: #ffd460;
 }
-
 .comment-form .textarea-field {
   resize: none;
 }
 
-/* Submit button */
-.submit-btn {
-  background-color: #ffd460;
-  color: #1c2837;
-  font-weight: 700;
-}
-
-.submit-btn:hover:not(:disabled) {
-  background-color: #ffc62d;
-}
-
-/* Form messages */
+/* Messages */
 .error-message {
   color: #e63946;
   margin-top: 0.25rem;
 }
-
 .success-message {
   color: #2a9d8f;
   margin-top: 0.25rem;
+}
+
+/* Responsive modal content */
+@media (max-width: 640px) {
+  .modal-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .modal-image {
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+  }
+
+  .modal-comment-preview {
+    position: static;
+    background: rgba(28, 40, 55, 0.95);
+    max-width: 100%;
+    max-height: none;
+    margin-top: 1rem;
+    padding: 1rem;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .modal-floating-btns {
+    position: static;
+    margin-top: 1rem;
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* Show More button */
+.btn-show-more {
+  background-color: transparent;
+  color: #ffd460;
+  border: 1px solid #ffd460;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background-color 0.2s, color 0.2s;
+  width: auto;
+}
+
+.btn-show-more:hover {
+  background-color: #ffd460;
+  color: #1c2837;
 }

@@ -14,6 +14,15 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: true,
   },
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000', // vercel dev server
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
   // Optional base path if deploying under a subfolder:
   // base: '/photos/26Jul2025/',
 })
