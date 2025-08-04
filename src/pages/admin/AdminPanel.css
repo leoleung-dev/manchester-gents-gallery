@@ -1,10 +1,11 @@
+
 /* Container */
 .admin-container {
   max-width: 1024px;
   margin: 0 auto;
   padding: 2rem 1rem 1rem;
-  background-color: #1c2837; /* brand dark background */
-  color: #ffd460; /* brand text color */
+  background-color: #1c2837;
+  color: #ffd460;
   min-height: 100vh;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
@@ -19,7 +20,7 @@
   background-color: #1c2837;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 1rem;
   padding: 0.75rem 1.5rem;
@@ -28,13 +29,12 @@
   border-radius: 0.375rem;
 }
 
-/* Logo link */
+/* Logo */
 .header-logo-link {
   display: flex;
   align-items: center;
 }
 
-/* Logo image */
 .header-logo {
   height: 48px;
   width: auto;
@@ -45,33 +45,25 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #ffd460;
+  flex-grow: 1;
+  margin-left: 1rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  flex-grow: 1;
-  margin-left: 1rem;
 }
 
-/* Tabs container */
+/* Tabs */
 .admin-tabs {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 0.5rem;
   flex-shrink: 0;
 }
 
-@media (min-width: 640px) {
-  .admin-tabs {
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-/* Tab button */
 .admin-tab-button {
-  padding: 0.4rem 0.8rem;
-  border-radius: 0.375rem;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
@@ -79,6 +71,8 @@
   color: #ffd460;
   border: none;
   transition: background-color 0.3s ease;
+  min-width: 100px;
+  text-align: center;
 }
 
 .admin-tab-button.active,
@@ -89,7 +83,8 @@
 
 /* Refresh button */
 .admin-refresh-btn {
-  padding: 0.4rem 0.8rem;
+  width: 40px;
+  height: 40px;
   border-radius: 0.375rem;
   background-color: #ffd460;
   color: #1c2837;
@@ -100,19 +95,16 @@
   align-items: center;
   justify-content: center;
   transition: background-color 0.3s ease;
-  flex-shrink: 0;
-  width: 40px;
-  height: 40px;
 }
 
 .admin-refresh-btn:hover {
   background-color: #ffc62d;
 }
 
-/* Bulk delete button */
+/* Bulk delete */
 .admin-bulk-delete-btn {
-  background-color: #b91c1c; /* red-700 */
-  color: #fee2e2; /* red-100 */
+  background-color: #b91c1c;
+  color: #fee2e2;
   font-weight: 700;
   padding: 0.6rem 1rem;
   border-radius: 0.375rem;
@@ -129,17 +121,16 @@
 }
 
 .admin-bulk-delete-btn:hover:not(:disabled) {
-  background-color: #991b1b; /* red-800 */
+  background-color: #991b1b;
 }
 
-/* Photos grid */
+/* Grid layout */
 .admin-photos-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 0.75rem;
 }
 
-/* Photo card wrapper with checkbox */
 .selectable-photo-wrapper {
   position: relative;
   border-radius: 0.375rem;
@@ -147,16 +138,12 @@
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
 }
 
 .selectable-photo-wrapper:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
-/* Checkbox inside photo card */
 .admin-photo-checkbox {
   position: absolute;
   top: 0.5rem;
@@ -164,26 +151,22 @@
   z-index: 20;
   height: 1.25rem;
   width: 1.25rem;
-  accent-color: #ffd460; /* brand yellow */
+  accent-color: #ffd460;
   cursor: pointer;
   background-color: rgba(28, 40, 55, 0.7);
   border-radius: 0.25rem;
 }
 
-/* Photo image container */
 .selectable-photo {
   border-radius: 0.375rem;
   overflow: hidden;
-  transition: box-shadow 0.2s ease;
   position: relative;
-  outline: none;
 }
 
 .selectable-photo.selected {
-  box-shadow: 0 0 0 3px #ffd460; /* brand yellow highlight */
+  box-shadow: 0 0 0 3px #ffd460;
 }
 
-/* Photo image */
 .selectable-photo-image {
   width: 100%;
   height: 100px;
@@ -197,7 +180,6 @@
   opacity: 0.8;
 }
 
-/* Delete button on photo */
 .btn-delete-single {
   position: absolute;
   top: 0.25rem;
@@ -213,23 +195,19 @@
   opacity: 0;
   transition: opacity 0.2s ease;
   z-index: 25;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .selectable-photo-wrapper:hover .btn-delete-single {
   opacity: 1;
 }
 
-/* Comments list */
+/* Comments */
 .comment-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-/* Comment card */
 .comment-item {
   display: flex;
   gap: 0.75rem;
@@ -237,11 +215,10 @@
   padding: 0.5rem;
   border-radius: 0.375rem;
   background-color: #2d4059;
-  align-items: center;
   color: #ffd460;
+  align-items: center;
 }
 
-/* Comment checkbox */
 .comment-item input[type="checkbox"] {
   flex-shrink: 0;
   width: 20px;
@@ -249,7 +226,6 @@
   cursor: pointer;
 }
 
-/* Comment image */
 .comment-photo {
   width: 80px;
   height: 80px;
@@ -257,12 +233,10 @@
   border-radius: 0.375rem;
 }
 
-/* Comment content */
 .comment-content {
   flex: 1;
 }
 
-/* Comment name & instagram */
 .comment-name {
   font-weight: 700;
   margin-right: 0.5rem;
@@ -272,39 +246,34 @@
   color: #c1b56a;
 }
 
-/* Comment message */
 .comment-message {
   margin-top: 0.25rem;
   font-size: 0.9rem;
 }
 
-/* Comment timestamp */
 .comment-date {
   margin-top: 0.25rem;
   font-size: 0.75rem;
   color: #c1b56a;
 }
 
-/* Responsive tweaks */
+/* Responsive */
 @media (max-width: 640px) {
   .admin-photos-grid {
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   }
-  .admin-header-toolbar {
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-  }
+
   .admin-title {
     margin: 0.5rem 0;
     flex-grow: 1;
   }
+
   .admin-tabs {
     width: 100%;
     justify-content: center;
   }
+
   .admin-refresh-btn {
-    width: 40px;
-    height: 40px;
+    margin: 0 auto;
   }
 }
