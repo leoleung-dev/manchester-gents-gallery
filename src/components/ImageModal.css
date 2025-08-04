@@ -10,15 +10,24 @@
   z-index: 50;
 }
 
-/* Close button */
+/* Modal image container */
+.modal-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90vw;
+  max-width: 900px;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+/* Close button now overlays the image */
 .modal-close-btn-container {
   position: absolute;
-  top: -2rem;
-  right: 0;
-  z-index: 20;
-  display: flex;
-  justify-content: flex-end;
-  width: 100%;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
 }
 
 .modal-close-btn {
@@ -36,16 +45,6 @@
   cursor: pointer;
 }
 
-/* Modal image container */
-.modal-content {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 90vw;
-  max-width: 900px;
-}
-
 /* Navigation buttons */
 .modal-nav-btn {
   position: absolute;
@@ -60,6 +59,7 @@
   padding: 0 1rem;
   opacity: 0.75;
   transition: opacity 0.3s;
+  z-index: 5;
 }
 .modal-nav-btn:hover {
   opacity: 1;

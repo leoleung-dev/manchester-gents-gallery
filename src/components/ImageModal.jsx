@@ -1,20 +1,12 @@
 import { useEffect, useState } from "react";
 import { FaCommentDots, FaDownload, FaTimes } from "react-icons/fa";
-import "./ImageModal.css"; // new CSS file for modal styles
+import "./ImageModal.css";
 
-export default function ImageModal({
-  photo,
-  onClose,
-  onPrev,
-  onNext,
-  apiBase,
-}) {
+export default function ImageModal({ photo, onClose, onPrev, onNext, apiBase }) {
   const API = apiBase || "";
 
   const [name, setName] = useState(localStorage.getItem("userName") || "");
-  const [instagram, setInstagram] = useState(
-    localStorage.getItem("userInstagram") || ""
-  );
+  const [instagram, setInstagram] = useState(localStorage.getItem("userInstagram") || "");
   const [message, setMessage] = useState("");
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -41,9 +33,7 @@ export default function ImageModal({
       try {
         const query = `*[_type=="comment" && photo._ref=="${photo._id}"]|order(createdAt desc)`;
         const res = await fetch(
-          `https://${projectId}.api.sanity.io/v2021-10-21/data/query/${dataset}?query=${encodeURIComponent(
-            query
-          )}`
+          `https://${projectId}.api.sanity.io/v2021-10-21/data/query/${dataset}?query=${encodeURIComponent(query)}`
         );
         const json = await res.json();
         setComments(json.result || []);
@@ -113,32 +103,21 @@ export default function ImageModal({
       role="dialog"
       tabIndex={-1}
     >
-      <div className="modal-close-btn-container">
-        <button
-          onClick={onClose}
-          className="modal-close-btn"
-          aria-label="Close modal"
-        >
-          <FaTimes />
-        </button>
-      </div>
-
       <div className="modal-content">
-        <button
-          onClick={onPrev}
-          className="modal-nav-btn modal-prev"
-          aria-label="Previous image"
-        >
+        {/* Close button now inside and always visible */}
+        <div className="modal-close-btn-container">
+          <button onClick={onClose} className="modal-close-btn" aria-label="Close modal">
+            <FaTimes />
+          </button>
+        </div>
+
+        <button onClick={onPrev} className="modal-nav-btn modal-prev" aria-label="Previous image">
           ‹
         </button>
 
         <img src={photo.url} alt="Enlarged" className="modal-image" />
 
-        <button
-          onClick={onNext}
-          className="modal-nav-btn modal-next"
-          aria-label="Next image"
-        >
+        <button onClick={onNext} className="modal-nav-btn modal-next" aria-label="Next image">
           ›
         </button>
       </div>
@@ -164,27 +143,16 @@ export default function ImageModal({
         >
           <FaDownload className="icon" /> Download
         </button>
-        <button
-          onClick={() => setShowComments(true)}
-          className="btn btn-primary"
-        >
+
+        <button onClick={() => setShowComments(true)} className="btn btn-primary">
           <FaCommentDots className="icon" /> Comment
         </button>
       </div>
 
       {showComments && (
-        <div
-          className="comments-overlay"
-          role="dialog"
-          aria-modal="true"
-          tabIndex={-1}
-        >
+        <div className="comments-overlay" role="dialog" aria-modal="true" tabIndex={-1}>
           <div className="comments-modal">
-            <button
-              onClick={() => setShowComments(false)}
-              className="comments-close-btn"
-              aria-label="Close comments"
-            >
+            <button onClick={() => setShowComments(false)} className="comments-close-btn" aria-label="Close comments">
               <FaTimes />
             </button>
             <h2 className="comments-title">Comments</h2>
@@ -196,11 +164,7 @@ export default function ImageModal({
                   <div key={c._id || `${c.name}-${i}`} className="comment-item">
                     <p className="comment-author">
                       {c.name}{" "}
-                      {c.instagram && (
-                        <span className="comment-instagram">
-                          ({c.instagram})
-                        </span>
-                      )}
+                      {c.instagram && <span className="comment-instagram">({c.instagram})</span>}
                     </p>
                     <p className="comment-message">{c.message}</p>
                   </div>
@@ -232,18 +196,12 @@ export default function ImageModal({
                 onChange={(e) => setMessage(e.target.value)}
                 required
               />
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary submit-btn"
-              >
+              <button type="submit" disabled={loading} className="btn btn-primary submit-btn">
                 {loading ? "Posting..." : "Post Comment"}
               </button>
               {errorMessage && <p className="error-message">{errorMessage}</p>}
               {success && <p className="success-message">Comment posted!</p>}
-              {success === false && (
-                <p className="error-message">Failed to post comment.</p>
-              )}
+              {success === false && <p className="error-message">Failed to post comment.</p>}
             </form>
           </div>
         </div>
