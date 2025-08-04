@@ -21,6 +21,7 @@
           "value": "(?i)(bot|crawl|spider|slack|facebook|discord|whatsapp|opengraph|twitterbot)"
         }
       ],
+      "status": 307,
       "dest": "/api/seo?slug=$slug"
     },
     { "src": "/api/(.*)", "dest": "/api/$1.js" },
