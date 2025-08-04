@@ -1,3 +1,4 @@
+// src/pages/EventGallery.jsx
 import { useParams } from 'react-router-dom'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { urlFor } from '@/lib/sanityClient'
@@ -127,11 +128,17 @@ export default function EventGallery({ apiBase }) {
     currentIndex > 0 &&
     setSelectedPhoto(photos[currentIndex - 1])
 
+  const breakpointColumnsObj = {
+    default: 3,
+    1024: 2,
+    600: 1,
+  }
+
   return (
     <div className="relative max-w-6xl mx-auto p-4">
       <header className="flex flex-wrap justify-between items-center mb-4 gap-2">
         <h1 className="text-2xl font-bold">Event: {slug}</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => fileInputRef.current.click()}
             disabled={uploading}
@@ -179,48 +186,44 @@ export default function EventGallery({ apiBase }) {
         </div>
       )}
 
-      {/* Masonry Layout */}
-<Masonry
-  breakpointCols={{ default: 3, 768: 2, 500: 1 }}
-  className="flex w-auto gap-4"
-  columnClassName="masonry-column"
->
-  {photos.map(photo => {
-    const isSel = selectedIds.has(photo._id)
-    return (
-      <div
-        key={photo._id}
-        className="mb-4 break-inside-avoid relative group"
-      >
-        <input
-          type="checkbox"
-          className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
-          checked={isSel}
-          onChange={() => toggleSelect(photo._id)}
-        />
-        <div
-          onClick={() =>
-            selectedIds.size > 0
-              ? toggleSelect(photo._id)
-              : setSelectedPhoto(photo)
-          }
-          className={`overflow-hidden rounded shadow cursor-pointer ${
-            isSel ? 'ring-4 ring-green-400' : ''
-          }`}
-        >
-          <img
-            src={photo.thumbnailUrl}
-            alt=""
-            className="w-full h-auto object-cover hover:opacity-80 transition"
-          />
-          <div className="text-xs text-gray-500 px-1 pt-1">
-            {photo.dateTaken.toLocaleString()}
-          </div>
-        </div>
-      </div>
-    )
-  })}
-</Masonry>
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="masonry-grid"
+        columnClassName="masonry-column"
+      />
+        {photos.map(photo => {
+          const isSel = selectedIds.has(photo._id)
+          return (
+            <div key={photo._id} className="relative group mb-4">
+              <input
+                type="checkbox"
+                className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
+                checked={isSel}
+                onChange={() => toggleSelect(photo._id)}
+              />
+              <div
+                onClick={() =>
+                  selectedIds.size > 0
+                    ? toggleSelect(photo._id)
+                    : setSelectedPhoto(photo)
+                }
+                className={`overflow-hidden rounded shadow cursor-pointer ${
+                  isSel ? 'ring-4 ring-green-400' : ''
+                }`}
+              >
+                <img
+                  src={photo.thumbnailUrl}
+                  alt=""
+                  className="w-full object-cover hover:opacity-80 transition"
+                />
+                <div className="text-xs text-gray-500 px-1 pt-1">
+                  {photo.dateTaken.toLocaleString()}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+      </Masonry>
 
       {selectedPhoto && (
         <ImageModal
