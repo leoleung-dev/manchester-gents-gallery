@@ -300,3 +300,18 @@ button:disabled {
     height: 16px;
   }
 }
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(28, 40, 55, 0.85);
+  color: #ffd460;
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}

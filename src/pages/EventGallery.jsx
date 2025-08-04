@@ -90,38 +90,52 @@ export default function EventGallery({ apiBase }) {
     setTimeout(() => setFeedback(null), 3000);
   };
 
-  const handleFileChange = async (e) => {
-    const files = Array.from(e.target.files);
-    if (!files.length) return;
+const handleFileChange = async (e) => {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
 
-    setUploading(true);
-    setFeedback(null);
-    try {
-      console.log("Uploading:", files[0].name, files[0].size);
+  setUploading(true);
+  setFeedback({ type: "info", message: "Uploading images…" });
+
+  let successCount = 0;
+
+  try {
+    for (const file of files) {
       const form = new FormData();
-      form.append("file", files[0]); // only send 1 image for now
+      form.append("file", file);
       form.append("eventSlug", slug);
 
-      const res = await fetch('https://manchester-gents-gallery-uploadserver-production.up.railway.app/upload', {
-        method: "POST",
-        body: form,
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.message || "Upload failed");
-      }
+      const res = await fetch(
+        "https://manchester-gents-gallery-uploadserver-production.up.railway.app/upload",
+        {
+          method: "POST",
+          body: form,
+        }
+      );
 
-      setFeedback({ type: "success", message: "Images uploaded!" });
-      await loadPhotos();
-    } catch (err) {
-      console.error("Upload error:", err);
-      setFeedback({ type: "error", message: err.message });
-    } finally {
-      setUploading(false);
-      fileInputRef.current.value = null;
-      setTimeout(() => setFeedback(null), 3000);
+      if (res.ok) {
+        successCount++;
+      } else {
+        const err = await res.json().catch(() => ({}));
+        console.error("Upload error:", err);
+      }
     }
-  };
+
+    if (successCount > 0) {
+      setFeedback({ type: "success", message: `${successCount} image(s) uploaded!` });
+      await loadPhotos();
+    } else {
+      throw new Error("All uploads failed.");
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    setFeedback({ type: "error", message: err.message || "Upload failed" });
+  } finally {
+    setUploading(false);
+    fileInputRef.current.value = null;
+    setTimeout(() => setFeedback(null), 3000);
+  }
+};
 
   const currentIndex = selectedPhoto
     ? photos.findIndex((p) => p._id === selectedPhoto._id)
