@@ -36,10 +36,6 @@ async function run() {
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://photos.manchestergents.com/event/${event.slug}" />
     <meta name="twitter:card" content="summary_large_image" />
-
-    <script>
-      window.location.replace("/event/${event.slug}");
-    </script>
   </head>
   <body></body>
 </html>`;
