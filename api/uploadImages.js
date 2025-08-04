@@ -2,6 +2,7 @@ import formidable from 'formidable'
 import fs from 'fs'
 import { basename } from 'path'
 import { createClient } from '@sanity/client'
+import exifr from 'exifr'
 
 // Required by Vercel to disable default body parsing
 export const config = {
@@ -46,21 +47,33 @@ export default async function handler(req, res) {
     }
 
     const takenAtRaw = fields.takenAt || []
-    const takenAtArray = Array.isArray(takenAtRaw)
-      ? takenAtRaw
-      : [takenAtRaw]
-
+    const takenAtArray = Array.isArray(takenAtRaw) ? takenAtRaw : [takenAtRaw]
     const fileArray = Array.isArray(images) ? images : [images]
+
     const uploaded = []
 
     for (let i = 0; i < fileArray.length; i++) {
       const file = fileArray[i]
       if (!file || !file.filepath) continue
 
-      const takenAt = takenAtArray[i] || null
+      let takenAt = takenAtArray[i] || null
 
       try {
         const buffer = fs.readFileSync(file.filepath)
+
+        // Extract takenAt from EXIF if not provided
+        if (!takenAt) {
+          try {
+            const exifData = await exifr.parse(buffer, { pick: ['DateTimeOriginal'] })
+            if (exifData?.DateTimeOriginal) {
+              takenAt = new Date(exifData.DateTimeOriginal).toISOString()
+            }
+          } catch (exifErr) {
+            console.warn(`Failed to extract EXIF for ${file.originalFilename}:`, exifErr)
+          }
+        }
+
+        // Upload image to Sanity
         const asset = await client.assets.upload('image', buffer, {
           filename: basename(file.originalFilename),
         })
@@ -72,7 +85,7 @@ export default async function handler(req, res) {
             _type: 'image',
             asset: { _type: 'reference', _ref: asset._id },
           },
-          ...(takenAt ? { takenAt: new Date(takenAt).toISOString() } : {}),
+          ...(takenAt ? { takenAt } : {}),
         })
 
         uploaded.push(result._id)
