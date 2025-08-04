@@ -12,8 +12,8 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
+    sourcemap: true,
   },
-  server: {
-    historyApiFallback: true,
-  },
+  // Optional base path if deploying under a subfolder:
+  // base: '/photos/26Jul2025/',
 })
