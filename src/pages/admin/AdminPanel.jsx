@@ -50,7 +50,7 @@ const loadData = useCallback(async () => {
       client.fetch(
         `*[_type=="photo" && eventSlug==$slug]{
            _id, image, takenAt, _createdAt
-         } | order(takenAt asc)`,
+         } | order(takenAt desc)`,
         { slug }
       ),
       client.fetch(

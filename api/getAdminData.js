@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   try {
     const [photos, comments] = await Promise.all([
       client.fetch(
-        `*[_type == "photo" && eventSlug == $slug] | order(takenAt asc){
+        `*[_type == "photo" && eventSlug == $slug] | order(takenAt desc){
           _id, image, takenAt, _createdAt
         }`,
         { slug }
