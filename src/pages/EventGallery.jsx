@@ -126,23 +126,6 @@ export default function EventGallery({ apiBase }) {
     currentIndex > 0 &&
     setSelectedPhoto(photos[currentIndex - 1])
 
-  const getColumns = (items, columnCount) => {
-    const cols = Array.from({ length: columnCount }, () => [])
-    items.forEach((item, i) => {
-      cols[i % columnCount].push(item)
-    })
-    return cols
-  }
-
-  const getColumnCount = () => {
-    const width = window.innerWidth
-    if (width < 500) return 1
-    if (width < 768) return 2
-    return 3
-  }
-
-  const columns = getColumns(photos, getColumnCount())
-
   return (
     <div className="relative max-w-6xl mx-auto p-4">
       <header className="flex flex-wrap justify-between items-center mb-4 gap-2">
@@ -195,43 +178,40 @@ export default function EventGallery({ apiBase }) {
         </div>
       )}
 
-      <div className="flex gap-4">
-        {columns.map((col, i) => (
-          <div key={i} className="flex flex-col gap-4 flex-1">
-            {col.map(photo => {
-              const isSel = selectedIds.has(photo._id)
-              return (
-                <div key={photo._id} className="relative group">
-                  <input
-                    type="checkbox"
-                    className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
-                    checked={isSel}
-                    onChange={() => toggleSelect(photo._id)}
-                  />
-                  <div
-                    onClick={() =>
-                      selectedIds.size > 0
-                        ? toggleSelect(photo._id)
-                        : setSelectedPhoto(photo)
-                    }
-                    className={`overflow-hidden rounded shadow cursor-pointer ${
-                      isSel ? 'ring-4 ring-green-400' : ''
-                    }`}
-                  >
-                    <img
-                      src={photo.thumbnailUrl}
-                      alt=""
-                      className="w-full object-cover hover:opacity-80 transition"
-                    />
-                    <div className="text-xs text-gray-500 px-1 pt-1">
-                      {photo.dateTaken.toLocaleString()}
-                    </div>
-                  </div>
+      {/* ⬇️ Updated: Responsive grid layout */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {photos.map(photo => {
+          const isSel = selectedIds.has(photo._id)
+          return (
+            <div key={photo._id} className="relative group">
+              <input
+                type="checkbox"
+                className="absolute top-2 left-2 z-20 h-5 w-5 text-green-600"
+                checked={isSel}
+                onChange={() => toggleSelect(photo._id)}
+              />
+              <div
+                onClick={() =>
+                  selectedIds.size > 0
+                    ? toggleSelect(photo._id)
+                    : setSelectedPhoto(photo)
+                }
+                className={`overflow-hidden rounded shadow cursor-pointer ${
+                  isSel ? 'ring-4 ring-green-400' : ''
+                }`}
+              >
+                <img
+                  src={photo.thumbnailUrl}
+                  alt=""
+                  className="w-full object-cover hover:opacity-80 transition"
+                />
+                <div className="text-xs text-gray-500 px-1 pt-1">
+                  {photo.dateTaken.toLocaleString()}
                 </div>
-              )
-            })}
-          </div>
-        ))}
+              </div>
+            </div>
+          )
+        })}
       </div>
 
       {selectedPhoto && (
