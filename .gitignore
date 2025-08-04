@@ -36,3 +36,4 @@ studio/.sanity/
 *.tgz
 *.zip
 *.tmp
+.vercel
