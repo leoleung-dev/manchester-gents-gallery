@@ -28,9 +28,7 @@ export default function EventGallery({ apiBase }) {
           thumbnailUrl: urlFor(p.image).width(400).auto('format').url(),
           url: urlFor(p.image).width(1000).auto('format').url(),
           originalUrl: urlFor(p.image).url(),
-          dateTaken: p.exifDate
-            ? new Date(p.exifDate.replace(/^(\d{4}):(\d{2}):(\d{2})/, '$1-$2-$3'))
-            : new Date(p._createdAt),
+          dateTaken: new Date(p.takenAt || p._createdAt),
         }))
       )
 

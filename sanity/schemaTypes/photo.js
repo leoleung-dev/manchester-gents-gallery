@@ -1,20 +1,34 @@
 export default {
   name: 'photo',
-  type: 'document',
   title: 'Photo',
+  type: 'document',
   fields: [
-    { name: 'eventSlug', type: 'string', title: 'Event Slug' },
     {
-      name: 'image',
-      type: 'image',
-      title: 'Image',
-      options: { hotspot: true }
+      name: 'eventSlug',
+      title: 'Event Slug',
+      type: 'string',
+      validation: Rule => Rule.required(),
     },
     {
-      name: 'createdAt',
+      name: 'image',
+      title: 'Image',
+      type: 'image',
+      options: { hotspot: true },
+      validation: Rule => Rule.required(),
+    },
+    {
+      name: 'takenAt',
+      title: 'Taken At',
       type: 'datetime',
-      title: 'Created At',
-      initialValue: () => new Date().toISOString()
-    }
-  ]
+      description: 'EXIF DateTimeOriginal or fallback timestamp',
+    },
+    {
+  name: 'createdAt',
+  title: 'Created At',
+  type: 'datetime',
+  readOnly: true,
+  hidden: true // or false if you want to show it
+},
+
+  ],
 }

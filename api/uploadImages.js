@@ -45,11 +45,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'No files uploaded' })
     }
 
+    const takenAtRaw = fields.takenAt || []
+    const takenAtArray = Array.isArray(takenAtRaw)
+      ? takenAtRaw
+      : [takenAtRaw]
+
     const fileArray = Array.isArray(images) ? images : [images]
     const uploaded = []
 
-    for (const file of fileArray) {
+    for (let i = 0; i < fileArray.length; i++) {
+      const file = fileArray[i]
       if (!file || !file.filepath) continue
+
+      const takenAt = takenAtArray[i] || null
 
       try {
         const buffer = fs.readFileSync(file.filepath)
@@ -64,7 +72,7 @@ export default async function handler(req, res) {
             _type: 'image',
             asset: { _type: 'reference', _ref: asset._id },
           },
-          createdAt: new Date().toISOString(),
+          ...(takenAt ? { takenAt: new Date(takenAt).toISOString() } : {}),
         })
 
         uploaded.push(result._id)
