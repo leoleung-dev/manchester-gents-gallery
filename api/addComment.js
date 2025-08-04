@@ -14,15 +14,15 @@ export default async function handler(req, res) {
   try {
     const { name, instagram, message, photoId } = req.body
 
-    if (!photoId || !message?.trim()) {
+    if (!photoId || !message?.trim() || !name?.trim() || !instagram?.trim()) {
       return res.status(400).json({ success: false, message: 'Missing required fields' })
     }
 
     const { _id } = await client.create({
       _type: 'comment',
-      name,
-      instagram,
-      message,
+      name: name.trim(),
+      instagram: instagram.trim(),
+      message: message.trim(),
       photo: { _type: 'reference', _ref: photoId },
       createdAt: new Date().toISOString(),
     })

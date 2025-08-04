@@ -16,6 +16,7 @@ export default async function handler(req, res) {
     if (!Array.isArray(ids) || !ids.length) throw new Error('Missing ids')
 
     const tx = client.transaction()
+
     ids.forEach((cid) => {
       tx.delete(cid)
       tx.delete(`drafts.${cid}`)

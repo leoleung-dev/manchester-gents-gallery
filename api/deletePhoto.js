@@ -1,3 +1,5 @@
+// api/deletePhoto.js
+
 import { createClient } from '@sanity/client'
 
 const client = createClient({
@@ -16,42 +18,50 @@ export default async function handler(req, res) {
 
   try {
     const { id } = req.body
-    if (!id) throw new Error('Missing id')
+    if (!id) throw new Error('Missing `id` in request body')
 
-    // 1) Get image asset reference
+    // 1. Fetch the photo's asset reference
     const photo = await client.fetch(
       '*[_id == $id][0]{ "assetRef": image.asset._ref }',
       { id }
     )
 
-    if (!photo?.assetRef) {
+    if (!photo) {
       return res.status(404).json({ success: false, message: 'Photo not found' })
     }
 
     const { assetRef } = photo
 
-    // 2) Find all comments referencing the photo
+    // 2. Get all comment IDs referencing this photo
     const commentIds = await client.fetch(
       '*[_type == "comment" && photo._ref == $id]._id',
       { id }
     )
 
-    // 3) Prepare transaction
+    // 3. Create a Sanity transaction
     const tx = client.transaction()
-    commentIds.forEach((cid) => {
+
+    // 3a. Delete all referencing comments (and their drafts)
+    for (const cid of commentIds) {
       tx.delete(cid)
       tx.delete(`drafts.${cid}`)
-    })
+    }
+
+    // 3b. Delete the photo document (and its draft)
     tx.delete(id)
     tx.delete(`drafts.${id}`)
-    tx.delete(assetRef)
 
-    // 4) Commit transaction
+    // 3c. Delete the image asset itself
+    if (assetRef) {
+      tx.delete(assetRef)
+    }
+
+    // 4. Commit the transaction
     await tx.commit({ retry: 3 })
 
-    res.status(200).json({ success: true })
+    return res.status(200).json({ success: true })
   } catch (err) {
-    console.error('deletePhoto error:', err)
-    res.status(500).json({ success: false, message: err.message })
+    console.error('❌ deletePhoto error:', err)
+    return res.status(500).json({ success: false, message: err.message })
   }
 }

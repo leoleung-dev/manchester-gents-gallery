@@ -1,4 +1,5 @@
+import event from './event'
 import photo from './photo'
 import comment from './comment'
 
-export const schemaTypes = [photo, comment]
+export const schemaTypes = [event, photo, comment]

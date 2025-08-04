@@ -1,8 +1,18 @@
+import { createClient } from '@sanity/client'
+
 export const config = {
   api: {
     bodyParser: false,
   },
 }
+
+const sanityClient = createClient({
+  projectId: process.env.SANITY_PROJECT_ID,
+  dataset: process.env.SANITY_DATASET,
+  token: process.env.SANITY_API_TOKEN,
+  useCdn: false,
+  apiVersion: '2023-08-03',
+})
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
@@ -10,16 +20,62 @@ export default async function handler(req, res) {
   const uploadServerUrl = 'https://manchestergents-uploadserver.up.railway.app/upload'
 
   try {
+    // Proxy upload to your upload server
     const proxyRes = await fetch(uploadServerUrl, {
       method: 'POST',
       headers: req.headers,
       body: req,
     })
 
-    const data = await proxyRes.json()
-    res.status(proxyRes.status).json(data)
+    if (!proxyRes.ok) {
+      const errorText = await proxyRes.text()
+      return res.status(proxyRes.status).json({ error: errorText })
+    }
+
+    const uploadData = await proxyRes.json()
+    // uploadData should include the uploaded image asset info, e.g. asset URL, id, etc.
+
+    // Get eventSlug from query or headers or req somehow (adjust as per your client request)
+    // For example, if sent as query param:
+    const eventSlug = req.query.eventSlug || (req.headers['x-event-slug']) || null
+
+    if (!eventSlug) {
+      return res.status(400).json({ error: 'Missing eventSlug in request' })
+    }
+
+    // Fetch event document _id by slug
+    const event = await sanityClient.fetch(
+      '*[_type=="event" && slug.current == $slug][0]{_id}',
+      { slug: eventSlug }
+    )
+
+    if (!event) {
+      return res.status(404).json({ error: `Event with slug '${eventSlug}' not found` })
+    }
+
+    // Construct photo document with event reference and uploaded image info
+    const photoDoc = {
+      _type: 'photo',
+      event: {
+        _type: 'reference',
+        _ref: event._id,
+      },
+      image: {
+        _type: 'image',
+        asset: {
+          _type: 'reference',
+          _ref: uploadData.assetId || uploadData.asset._ref || uploadData.asset._id, // adapt this based on your upload server response
+        },
+      },
+      // optionally add other fields like takenAt if available
+    }
+
+    // Create photo document in Sanity
+    const createdPhoto = await sanityClient.create(photoDoc)
+
+    res.status(201).json({ success: true, photo: createdPhoto })
   } catch (err) {
-    console.error('Proxy upload failed:', err)
+    console.error('Upload and Sanity create failed:', err)
     res.status(500).json({ error: 'Upload failed' })
   }
 }

@@ -1,8 +1,8 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import client, { urlFor } from '@/lib/sanityClient'
-import Logo from '@/assets/Logo.svg'  // adjust path as needed
-import { FaSyncAlt, FaTrashAlt } from 'react-icons/fa' // icons
+import { urlFor } from '@/lib/sanityClient'
+import Logo from '@/assets/Logo.svg'
+import { FaSyncAlt, FaTrashAlt } from 'react-icons/fa'
 import './AdminPanel.css'
 
 export default function AdminPanel({ apiBase }) {
@@ -18,20 +18,10 @@ export default function AdminPanel({ apiBase }) {
 
   const loadData = useCallback(async () => {
     try {
-      const [fetchedPhotos, fetchedComments] = await Promise.all([
-        client.fetch(
-          `*[_type=="photo" && eventSlug==$slug]{
-             _id, image, takenAt, _createdAt
-           } | order(takenAt desc)`,
-          { slug }
-        ),
-        client.fetch(
-          `*[_type=="comment" && photo->eventSlug==$slug]{
-             _id, name, instagram, message, createdAt, photo->{image}
-           } | order(createdAt desc)`,
-          { slug }
-        ),
-      ])
+      const res = await fetch(`${BASE}/api/getAdminData?slug=${slug}`)
+      if (!res.ok) throw new Error(`Failed to fetch admin data`)
+      const { photos: fetchedPhotos, comments: fetchedComments } = await res.json()
+
       setPhotos(
         fetchedPhotos.map(p => ({
           ...p,
@@ -55,27 +45,22 @@ export default function AdminPanel({ apiBase }) {
     return () => window.removeEventListener('focus', loadData)
   }, [loadData])
 
-  // Toggle photo selection (no drag)
   const togglePhotoSelect = id => {
     setSelectedPhotoIds(s => {
       const newSet = new Set(s)
-      if (newSet.has(id)) newSet.delete(id)
-      else newSet.add(id)
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id)
       return newSet
     })
   }
 
-  // Toggle comment selection (checkboxes)
   const toggleCommentSelect = id => {
     setSelectedCommentIds(s => {
       const newSet = new Set(s)
-      if (newSet.has(id)) newSet.delete(id)
-      else newSet.add(id)
+      newSet.has(id) ? newSet.delete(id) : newSet.add(id)
       return newSet
     })
   }
 
-  // CTRL+A to select all
   useEffect(() => {
     const onKey = e => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'a') {
@@ -108,7 +93,6 @@ export default function AdminPanel({ apiBase }) {
     return res.json()
   }
 
-  // Bulk and single deletes
   const handleBulkDeletePhotos = async () => {
     if (!selectedPhotoIds.size || !confirm(`Delete ${selectedPhotoIds.size} photo(s)?`)) return
     setLoading(true)
@@ -119,7 +103,9 @@ export default function AdminPanel({ apiBase }) {
     } catch (err) {
       console.error(err)
       alert('Bulk delete photos failed: ' + err.message)
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDeletePhoto = async id => {
@@ -128,11 +114,17 @@ export default function AdminPanel({ apiBase }) {
     try {
       await postJson('deletePhoto', { id })
       setPhotos(ps => ps.filter(p => p._id !== id))
-      setSelectedPhotoIds(s => { const n = new Set(s); n.delete(id); return n })
+      setSelectedPhotoIds(s => {
+        const n = new Set(s)
+        n.delete(id)
+        return n
+      })
     } catch (err) {
       console.error(err)
       alert('Delete photo failed: ' + err.message)
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleBulkDeleteComments = async () => {
@@ -145,7 +137,9 @@ export default function AdminPanel({ apiBase }) {
     } catch (err) {
       console.error(err)
       alert('Bulk delete comments failed: ' + err.message)
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleDeleteComment = async id => {
@@ -154,11 +148,34 @@ export default function AdminPanel({ apiBase }) {
     try {
       await postJson('deleteComment', { id })
       setComments(cs => cs.filter(c => c._id !== id))
-      setSelectedCommentIds(s => { const n = new Set(s); n.delete(id); return n })
+      setSelectedCommentIds(s => {
+        const n = new Set(s)
+        n.delete(id)
+        return n
+      })
     } catch (err) {
       console.error(err)
       alert('Delete comment failed: ' + err.message)
-    } finally { setLoading(false) }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSetDefaultCover = async () => {
+    if (selectedPhotoIds.size !== 1) return
+    const photoId = [...selectedPhotoIds][0]
+    setLoading(true)
+    try {
+      await postJson('setCoverImage', { slug, photoId })
+      alert('Default cover image set successfully')
+      setSelectedPhotoIds(new Set())
+      loadData()
+    } catch (err) {
+      console.error(err)
+      alert('Failed to set cover image: ' + err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -172,50 +189,41 @@ export default function AdminPanel({ apiBase }) {
           <button
             onClick={() => setActiveTab('photos')}
             className={`admin-tab-button ${activeTab === 'photos' ? 'active' : ''}`}
-            aria-label="Photos tab"
           >
             Photos
           </button>
           <button
             onClick={() => setActiveTab('comments')}
             className={`admin-tab-button ${activeTab === 'comments' ? 'active' : ''}`}
-            aria-label="Comments tab"
           >
             Comments
           </button>
         </div>
-        <button
-          onClick={loadData}
-          className="admin-refresh-btn"
-          aria-label="Refresh"
-          title="Refresh"
-        >
+        <button onClick={loadData} className="admin-refresh-btn" title="Refresh">
           <FaSyncAlt />
         </button>
       </header>
 
       {activeTab === 'photos' ? (
         <>
-          <button
-            onClick={handleBulkDeletePhotos}
-            disabled={loading || !selectedPhotoIds.size}
-            className="admin-bulk-delete-btn"
-            aria-label={`Delete Photos (${selectedPhotoIds.size})`}
-          >
+          {selectedPhotoIds.size === 1 && (
+            <button onClick={handleSetDefaultCover} className="admin-set-cover-btn" disabled={loading}>
+              {loading ? 'Setting cover…' : 'Make Default Cover Image'}
+            </button>
+          )}
+
+          <button onClick={handleBulkDeletePhotos} className="admin-bulk-delete-btn" disabled={loading || !selectedPhotoIds.size}>
             {loading ? 'Deleting…' : `Delete Photos (${selectedPhotoIds.size})`}
           </button>
+
           <div className="admin-photos-grid">
             {photos.map(photo => (
-              <div
-                key={photo._id}
-                className="selectable-photo-wrapper"
-              >
+              <div key={photo._id} className="selectable-photo-wrapper">
                 <input
                   type="checkbox"
                   className="admin-photo-checkbox"
                   checked={selectedPhotoIds.has(photo._id)}
                   onChange={() => togglePhotoSelect(photo._id)}
-                  aria-label={`Select photo ${photo._id}`}
                 />
                 <div
                   className={`selectable-photo ${selectedPhotoIds.has(photo._id) ? 'selected' : ''}`}
@@ -223,12 +231,6 @@ export default function AdminPanel({ apiBase }) {
                   tabIndex={0}
                   role="checkbox"
                   aria-checked={selectedPhotoIds.has(photo._id)}
-                  onKeyDown={e => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault()
-                      togglePhotoSelect(photo._id)
-                    }
-                  }}
                 >
                   <img
                     src={urlFor(photo.image).width(400).height(300).fit('crop').url()}
@@ -236,11 +238,7 @@ export default function AdminPanel({ apiBase }) {
                     className="selectable-photo-image"
                   />
                 </div>
-                <button
-                  onClick={() => handleDeletePhoto(photo._id)}
-                  className="btn-delete-single"
-                  aria-label={`Delete photo ${photo._id}`}
-                >
+                <button onClick={() => handleDeletePhoto(photo._id)} className="btn-delete-single">
                   <FaTrashAlt />
                 </button>
               </div>
@@ -249,12 +247,7 @@ export default function AdminPanel({ apiBase }) {
         </>
       ) : (
         <>
-          <button
-            onClick={handleBulkDeleteComments}
-            disabled={loading || !selectedCommentIds.size}
-            className="admin-bulk-delete-btn"
-            aria-label={`Delete Comments (${selectedCommentIds.size})`}
-          >
+          <button onClick={handleBulkDeleteComments} className="admin-bulk-delete-btn" disabled={loading || !selectedCommentIds.size}>
             {loading ? 'Deleting…' : `Delete Comments (${selectedCommentIds.size})`}
           </button>
           <div className="comment-list">
@@ -262,12 +255,7 @@ export default function AdminPanel({ apiBase }) {
               const sel = selectedCommentIds.has(c._id)
               return (
                 <div key={c._id} className="comment-item">
-                  <input
-                    type="checkbox"
-                    checked={sel}
-                    onChange={() => toggleCommentSelect(c._id)}
-                    aria-label={`Select comment by ${c.name}`}
-                  />
+                  <input type="checkbox" checked={sel} onChange={() => toggleCommentSelect(c._id)} />
                   <img
                     src={urlFor(c.photo.image).width(80).height(80).fit('crop').url()}
                     alt=""
@@ -277,11 +265,7 @@ export default function AdminPanel({ apiBase }) {
                     <div className="comment-header">
                       <span className="comment-name">{c.name}</span>{' '}
                       <span className="comment-instagram">({c.instagram})</span>
-                      <button
-                        onClick={() => handleDeleteComment(c._id)}
-                        className="btn-delete-comment"
-                        aria-label={`Delete comment by ${c.name}`}
-                      >
+                      <button onClick={() => handleDeleteComment(c._id)} className="btn-delete-comment">
                         <FaTrashAlt />
                       </button>
                     </div>

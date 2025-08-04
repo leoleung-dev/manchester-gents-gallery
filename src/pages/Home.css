@@ -1,0 +1,88 @@
+/* src/pages/Home.css */
+
+.home-container {
+  background-color: #1c2837;
+  color: #ffd460;
+  padding: 2rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  min-height: 100vh;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-logo {
+  width: 5rem;
+  margin-bottom: 1.5rem;
+}
+
+.home-title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 2rem;
+}
+
+.home-status {
+  color: #ccc;
+  font-style: italic;
+}
+
+.home-error {
+  color: #ff6b6b;
+  font-weight: bold;
+}
+
+.event-grid {
+  display: grid;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 40rem;
+}
+
+.event-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
+  background-color: #2d4059;
+}
+
+.event-card:hover {
+  transform: translateY(-4px);
+}
+
+.event-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.event-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.event-card:hover .event-image {
+  transform: scale(1.05);
+}
+
+.event-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(to top, #1c2837cc 60%, transparent);
+  color: #ffd460;
+  padding: 1rem;
+  text-align: center;
+}
+
+.event-overlay-text {
+  font-size: 1.125rem;
+  line-height: 1.4;
+}

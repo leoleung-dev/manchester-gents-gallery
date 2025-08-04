@@ -1,4 +1,3 @@
-// src/pages/EventGallery.jsx
 import { useParams, Link } from "react-router-dom";
 import { useEffect, useState, useRef, useCallback } from "react";
 import { urlFor } from "@/lib/sanityClient";
@@ -7,8 +6,8 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import Masonry from "react-masonry-css";
 import "./EventGallery.css";
-import Logo from "@/assets/Logo.svg"; // adjust path if needed
-import { FaUpload, FaDownload, FaSyncAlt } from "react-icons/fa"; // import font awesome icons
+import Logo from "@/assets/Logo.svg";
+import { FaUpload, FaDownload, FaSyncAlt } from "react-icons/fa";
 
 export default function EventGallery({ apiBase }) {
   const { slug } = useParams();
@@ -266,18 +265,18 @@ export default function EventGallery({ apiBase }) {
         })}
       </Masonry>
 
-{selectedPhoto && (
-  <>
-    <style>{`.header-toolbar { display: none !important; }`}</style>
-    <ImageModal
-      photo={selectedPhoto}
-      onClose={() => setSelectedPhoto(null)}
-      onNext={handleNext}
-      onPrev={handlePrev}
-      apiBase={API}
-    />
-  </>
-)}
+      {selectedPhoto && (
+        <>
+          <style>{`.header-toolbar { display: none !important; }`}</style>
+          <ImageModal
+            photo={selectedPhoto}
+            onClose={() => setSelectedPhoto(null)}
+            onNext={handleNext}
+            onPrev={handlePrev}
+            apiBase={API}
+          />
+        </>
+      )}
     </div>
   );
 }
