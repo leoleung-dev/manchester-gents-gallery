@@ -1,6 +1,5 @@
 // api/deletePhoto.js
 import setCorsHeaders from '../src/lib/setCorsHeaders.js'
-
 import { createClient } from '@sanity/client'
 
 const client = createClient({
@@ -12,6 +11,9 @@ const client = createClient({
 })
 
 export default async function handler(req, res) {
+  setCorsHeaders(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST'])
     return res.status(405).json({ success: false, message: 'Method Not Allowed' })
@@ -25,8 +27,6 @@ export default async function handler(req, res) {
     const photo = await client.fetch(
       '*[_id == $id][0]{ "assetRef": image.asset._ref }',
       { id }
-  setCorsHeaders(res);
-  if (req.method === 'OPTIONS') return res.status(200).end();
     )
 
     if (!photo) {

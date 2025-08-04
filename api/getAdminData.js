@@ -10,8 +10,11 @@ const client = createClient({
 })
 
 export default async function handler(req, res) {
-  const { slug } = req.query
-  if (!slug) return res.status(400).json({ error: 'Missing slug' })
+  setCorsHeaders(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const { slug } = req.query;
+  if (!slug) return res.status(400).json({ error: 'Missing slug' });
 
   try {
     // Fetch photos where the linked event's slug matches
@@ -24,9 +27,7 @@ export default async function handler(req, res) {
           _createdAt
         }`,
       { slug }
-  setCorsHeaders(res);
-  if (req.method === 'OPTIONS') return res.status(200).end();
-    )
+    );
 
     // Fetch comments where the linked photo belongs to the matching event
     const comments = await client.fetch(
@@ -40,11 +41,11 @@ export default async function handler(req, res) {
           photo->{ image, takenAt }
         }`,
       { slug }
-    )
+    );
 
-    res.status(200).json({ photos, comments })
+    res.status(200).json({ photos, comments });
   } catch (err) {
-    console.error('getAdminData error:', err)
-    res.status(500).json({ error: err.message })
+    console.error('getAdminData error:', err);
+    res.status(500).json({ error: err.message });
   }
 }

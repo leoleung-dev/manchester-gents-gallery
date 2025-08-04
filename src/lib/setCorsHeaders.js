@@ -3,10 +3,12 @@ export default function setCorsHeaders(res) {
     'http://localhost:5173',
     'https://photos.manchestergents.com'
   ];
+
   const origin = res.req?.headers?.origin;
 
   if (allowedOrigins.includes(origin)) {
     res.setHeader("Access-Control-Allow-Origin", origin);
+    res.setHeader("Access-Control-Allow-Credentials", "true");
   }
 
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");

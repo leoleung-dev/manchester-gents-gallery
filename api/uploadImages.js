@@ -16,6 +16,9 @@ const sanityClient = createClient({
 })
 
 export default async function handler(req, res) {
+  setCorsHeaders(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
   if (req.method !== 'POST') return res.status(405).end()
 
   const uploadServerUrl = 'https://manchestergents-uploadserver.up.railway.app/upload'
@@ -34,11 +37,9 @@ export default async function handler(req, res) {
     }
 
     const uploadData = await proxyRes.json()
-    // uploadData should include the uploaded image asset info, e.g. asset URL, id, etc.
 
     // Get eventSlug from query or headers or req somehow (adjust as per your client request)
-    // For example, if sent as query param:
-    const eventSlug = req.query.eventSlug || (req.headers['x-event-slug']) || null
+    const eventSlug = req.query.eventSlug || req.headers['x-event-slug'] || null
 
     if (!eventSlug) {
       return res.status(400).json({ error: 'Missing eventSlug in request' })
@@ -48,8 +49,6 @@ export default async function handler(req, res) {
     const event = await sanityClient.fetch(
       '*[_type=="event" && slug.current == $slug][0]{_id}',
       { slug: eventSlug }
-  setCorsHeaders(res);
-  if (req.method === 'OPTIONS') return res.status(200).end();
     )
 
     if (!event) {
@@ -67,10 +66,9 @@ export default async function handler(req, res) {
         _type: 'image',
         asset: {
           _type: 'reference',
-          _ref: uploadData.assetId || uploadData.asset._ref || uploadData.asset._id, // adapt this based on your upload server response
+          _ref: uploadData.assetId || uploadData.asset._ref || uploadData.asset._id,
         },
       },
-      // optionally add other fields like takenAt if available
     }
 
     // Create photo document in Sanity
