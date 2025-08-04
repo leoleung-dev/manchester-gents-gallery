@@ -5,7 +5,7 @@ export function middleware(request) {
   const isBot = /bot|crawl|spider|slack|facebook|discord|whatsapp/i.test(ua);
 
   const { pathname } = new URL(request.url);
-  const match = pathname.match(/^\\/event\\/([^/]+)/);
+  const match = pathname.match(/^\/event\/([^/]+)/);
 
   if (isBot && match) {
     const slug = match[1];

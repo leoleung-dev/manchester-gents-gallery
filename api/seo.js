@@ -1,4 +1,5 @@
 import { createClient } from '@sanity/client';
+import imageUrlBuilder from '@sanity/image-url';
 
 const sanity = createClient({
   projectId: 'ulu3s1tc',
@@ -6,6 +7,8 @@ const sanity = createClient({
   apiVersion: '2023-08-03',
   useCdn: true,
 });
+
+const builder = imageUrlBuilder(sanity);
 
 export const config = {
   runtime: 'edge',
@@ -23,9 +26,7 @@ export default async function handler(req) {
 
   const title = event?.title || slug;
   const imageUrl = event?.defaultCoverImage?.asset
-    ? `https://cdn.sanity.io/images/ulu3s1tc/production/${event.defaultCoverImage.asset._ref
-        .replace('image-', '')
-        .replace('-jpg', '.jpg')}`
+    ? builder.image(event.defaultCoverImage).width(1200).height(630).fit('crop').auto('format').url()
     : 'https://photos.manchestergents.com/default-og.png';
 
   const pageUrl = `https://photos.manchestergents.com/event/${slug}`;
@@ -41,6 +42,10 @@ export default async function handler(req) {
       <meta property="og:image" content="${imageUrl}" />
       <meta property="og:type" content="website" />
       <meta property="og:url" content="${pageUrl}" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="MG | ${title}" />
+      <meta name="twitter:description" content="Manchester Gents Gallery | View photos from ${title}" />
+      <meta name="twitter:image" content="${imageUrl}" />
       <title>${title}</title>
     </head>
     <body>
