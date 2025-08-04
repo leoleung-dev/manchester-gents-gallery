@@ -128,11 +128,11 @@ export default function EventGallery({ apiBase }) {
     currentIndex > 0 &&
     setSelectedPhoto(photos[currentIndex - 1])
 
-  const breakpointColumnsObj = {
-    default: 3,
-    1024: 2,
-    600: 1,
-  }
+const breakpointColumnsObj = {
+  default: 3,
+  768: 2,
+  480: 2,
+}
 
 return (
   <div className="relative max-w-6xl mx-auto p-4">
