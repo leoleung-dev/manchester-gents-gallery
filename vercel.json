@@ -18,7 +18,7 @@
         {
           "type": "header",
           "key": "user-agent",
-          "value": "(?i)(bot|crawl|spider|slack|facebook|discord|whatsapp|opengraph|twitterbot)"
+          "value": "(?i)(facebookexternalhit|bot|crawl|spider|slack|discord|twitterbot|whatsapp|linkedin|opengraph)"
         }
       ],
       "dest": "/event/$slug/index.html"
@@ -27,9 +27,7 @@
       "src": "/api/(.*)",
       "dest": "/api/$1.js"
     },
-    {
-      "handle": "filesystem"
-    },
+    { "handle": "filesystem" },
     {
       "src": "/(.*)",
       "dest": "/index.html"
