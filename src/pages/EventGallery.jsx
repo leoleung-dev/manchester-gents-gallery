@@ -17,6 +17,7 @@ export default function EventGallery({ apiBase }) {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [uploading, setUploading] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const fileInputRef = useRef(null);
 
   const API = apiBase || "";
