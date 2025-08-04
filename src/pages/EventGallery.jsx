@@ -55,7 +55,10 @@ export default function EventGallery({ apiBase }) {
         if (!res.ok) throw new Error("Failed to fetch event metadata");
         const data = await res.json();
         const match = data.find((e) => e.slug === slug);
-        if (match?.title) setEventTitle(match.title);
+        if (match?.title) {
+          setEventTitle(match.title);
+          document.title = `MG | ${match.title}`;
+        }
       } catch (err) {
         console.warn("Could not load event title, using slug.");
       }
