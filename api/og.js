@@ -1,36 +1,18 @@
 import { ImageResponse } from '@vercel/og';
-import { createClient } from '@sanity/client';
 
 export const config = {
-  runtime: 'edge', // required by Vercel for OG image generation
+  runtime: 'edge',
 };
-
-const sanity = createClient({
-  projectId: 'ulu3s1tc',
-  dataset: 'production',
-  useCdn: true,
-  apiVersion: '2023-08-03',
-});
 
 export default async function handler(req) {
   const { searchParams } = new URL(req.url);
   const slug = searchParams.get('slug');
+  if (!slug) return new Response('Missing slug', { status: 400 });
 
-  if (!slug) {
-    return new Response('Missing slug', { status: 400 });
-  }
+  const metaRes = await fetch(`https://photos.manchestergents.com/api/og-meta?slug=${slug}`);
+  if (!metaRes.ok) return new Response('Failed to load OG meta', { status: 500 });
 
-  const event = await sanity.fetch(
-    `*[_type == "event" && slug.current == $slug][0]{ title, defaultCoverImage }`,
-    { slug }
-  );
-
-  const title = event?.title || slug;
-  const imageUrl = event?.defaultCoverImage?.asset
-    ? `https://cdn.sanity.io/images/ulu3s1tc/production/${event.defaultCoverImage.asset._ref
-        .replace('image-', '')
-        .replace('-jpg', '.jpg')}`
-    : 'https://photos.manchestergents.com/default-og.png';
+  const { title, imageUrl } = await metaRes.json();
 
   return new ImageResponse(
     (
