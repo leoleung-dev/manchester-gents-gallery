@@ -8,6 +8,7 @@ import { saveAs } from 'file-saver'
 import Masonry from 'react-masonry-css'
 import './EventGallery.css'
 import Logo from '@/assets/Logo.svg'  // adjust path if needed
+import { FaUpload, FaDownload, FaSyncAlt } from 'react-icons/fa' // import font awesome icons
 
 export default function EventGallery({ apiBase }) {
   const { slug } = useParams()
@@ -133,7 +134,7 @@ export default function EventGallery({ apiBase }) {
   const breakpointColumnsObj = {
     default: 3,
     768: 2,
-    480: 1,
+    480: 2,
   }
 
   return (
@@ -147,19 +148,30 @@ export default function EventGallery({ apiBase }) {
           <button
             onClick={() => fileInputRef.current.click()}
             disabled={uploading}
-            className={`btn-upload ${uploading ? 'btn-disabled' : ''}`}
+            className={`btn-upload ${uploading ? "btn-disabled" : ""}`}
+            aria-label="Upload Images"
+            title="Upload Images"
           >
-            {uploading ? 'Uploading…' : 'Upload Images'}
+            <FaUpload size={18} />
           </button>
+
           <button
             onClick={handleDownloadSelected}
             disabled={!selectedIds.size}
             className="btn-download"
+            aria-label={`Download Selected (${selectedIds.size})`}
+            title={`Download Selected (${selectedIds.size})`}
           >
-            Download Selected ({selectedIds.size})
+            <FaDownload size={18} />
           </button>
-          <button onClick={loadPhotos} className="btn-refresh">
-            Refresh
+
+          <button
+            onClick={loadPhotos}
+            className="btn-refresh"
+            aria-label="Refresh"
+            title="Refresh"
+          >
+            <FaSyncAlt size={18} />
           </button>
         </div>
       </header>
@@ -184,8 +196,8 @@ export default function EventGallery({ apiBase }) {
         className="masonry-grid"
         columnClassName="masonry-column"
       >
-        {photos.map(photo => {
-          const isSel = selectedIds.has(photo._id)
+        {photos.map((photo) => {
+          const isSel = selectedIds.has(photo._id);
           return (
             <div key={photo._id} className="photo-card">
               <input
@@ -200,17 +212,17 @@ export default function EventGallery({ apiBase }) {
                     ? toggleSelect(photo._id)
                     : setSelectedPhoto(photo)
                 }
-                className={`photo-image-container ${isSel ? 'photo-selected' : ''}`}
+                className={`photo-image-container ${
+                  isSel ? "photo-selected" : ""
+                }`}
               >
-                <img
-                  src={photo.thumbnailUrl}
-                  alt=""
-                  className="photo-image"
-                />
-                <div className="photo-date">{photo.dateTaken.toLocaleString()}</div>
+                <img src={photo.thumbnailUrl} alt="" className="photo-image" />
+                <div className="photo-date">
+                  {photo.dateTaken.toLocaleString()}
+                </div>
               </div>
             </div>
-          )
+          );
         })}
       </Masonry>
 
@@ -224,5 +236,5 @@ export default function EventGallery({ apiBase }) {
         />
       )}
     </div>
-  )
+  );
 }
