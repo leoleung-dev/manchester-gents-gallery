@@ -14,15 +14,26 @@ const SelectablePhoto = createSelectable(
   ({ selectableRef, isSelected, onClick, photo }) => (
     <div
       ref={selectableRef}
-      onClick={() => onClick(photo._id)}
-      className={`selectable-photo ${isSelected ? 'selected' : ''}`}
+      className={`selectable-photo-wrapper`}
     >
-      <img
-        src={urlFor(photo.image).width(400).height(300).fit('crop').url()}
-        alt=""
-        className="selectable-photo-image"
+      <input
+        type="checkbox"
+        className="admin-photo-checkbox"
+        checked={isSelected}
+        onChange={() => onClick(photo._id)}
+        onClick={e => e.stopPropagation()} // prevent bubbling to parent div click
+        aria-label={`Select photo ${photo._id}`}
       />
-      {isSelected && <div className="selectable-photo-overlay" />}
+      <div
+        onClick={() => onClick(photo._id)}
+        className={`selectable-photo ${isSelected ? 'selected' : ''}`}
+      >
+        <img
+          src={urlFor(photo.image).width(400).height(300).fit('crop').url()}
+          alt=""
+          className="selectable-photo-image"
+        />
+      </div>
     </div>
   )
 )
@@ -232,20 +243,12 @@ export default function AdminPanel({ apiBase }) {
             allowClickWithoutSelected
           >
             {photos.map(photo => (
-              <div key={photo._id} className="admin-photo-card">
-                <SelectablePhoto
-                  photo={photo}
-                  isSelected={selectedPhotoIds.has(photo._id)}
-                  onClick={togglePhotoSelect}
-                />
-                <button
-                  onClick={() => handleDeletePhoto(photo._id)}
-                  className="btn-delete-single"
-                  aria-label={`Delete photo ${photo._id}`}
-                >
-                  <FaTrashAlt />
-                </button>
-              </div>
+              <SelectablePhoto
+                key={photo._id}
+                photo={photo}
+                isSelected={selectedPhotoIds.has(photo._id)}
+                onClick={togglePhotoSelect}
+              />
             ))}
           </SelectableGroup>
         </>

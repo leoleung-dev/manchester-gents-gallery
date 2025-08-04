@@ -129,8 +129,8 @@
   gap: 0.75rem;
 }
 
-/* Photo card */
-.admin-photo-card {
+/* Photo card wrapper with checkbox */
+.selectable-photo-wrapper {
   position: relative;
   border-radius: 0.375rem;
   overflow: hidden;
@@ -142,18 +142,49 @@
   justify-content: center;
 }
 
-.admin-photo-card:hover {
+.selectable-photo-wrapper:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
 }
 
-/* Selected overlay */
-.selectable-photo-overlay {
+/* Checkbox inside photo card */
+.admin-photo-checkbox {
   position: absolute;
-  inset: 0;
-  background-color: rgba(255, 212, 96, 0.3);
-  pointer-events: none;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 20;
+  height: 1.25rem;
+  width: 1.25rem;
+  accent-color: #ffd460; /* brand yellow */
+  cursor: pointer;
+  background-color: rgba(28, 40, 55, 0.7);
+  border-radius: 0.25rem;
+}
+
+/* Photo image container */
+.selectable-photo {
   border-radius: 0.375rem;
-  z-index: 10;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+  position: relative;
+  outline: none;
+}
+
+.selectable-photo.selected {
+  box-shadow: 0 0 0 3px #ffd460; /* brand yellow highlight */
+}
+
+/* Photo image */
+.selectable-photo-image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 0.375rem;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+
+.selectable-photo:hover .selectable-photo-image {
+  opacity: 0.8;
 }
 
 /* Delete button on photo */
@@ -171,22 +202,14 @@
   cursor: pointer;
   opacity: 0;
   transition: opacity 0.2s ease;
-  z-index: 20;
+  z-index: 25;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.admin-photo-card:hover .btn-delete-single {
+.selectable-photo-wrapper:hover .btn-delete-single {
   opacity: 1;
-}
-
-/* Photo image */
-.selectable-photo-image {
-  width: 100%;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 0.375rem;
 }
 
 /* Comments list */
