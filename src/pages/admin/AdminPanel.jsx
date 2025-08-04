@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import client, { urlFor } from '@/lib/sanityClient'
 import {
   SelectableGroup,
   createSelectable,
 } from 'react-selectable-fast'
 import './AdminPanel.css'  // import admin-specific styles
+import Logo from '@/assets/Logo.svg'  // adjust path as needed
+import { FaSyncAlt, FaTrashAlt } from 'react-icons/fa' // refresh and delete icons
 
 // ——— PHOTOS ———
 const SelectablePhoto = createSelectable(
@@ -20,9 +22,7 @@ const SelectablePhoto = createSelectable(
         alt=""
         className="selectable-photo-image"
       />
-      {isSelected && (
-        <div className="selectable-photo-overlay" />
-      )}
+      {isSelected && <div className="selectable-photo-overlay" />}
     </div>
   )
 )
@@ -179,44 +179,51 @@ export default function AdminPanel({ apiBase }) {
   }
 
   return (
-    <div className="admin-panel-container">
-      <header className="admin-panel-header">
-        <h1 className="admin-panel-title">Admin: {slug}</h1>
-        <div className="admin-panel-controls">
-          <nav className="admin-panel-nav">
-            <button
-              onClick={() => setActiveTab('photos')}
-              className={`admin-panel-tab ${activeTab === 'photos' ? 'active' : ''}`}
-            >
-              Photos
-            </button>
-            <button
-              onClick={() => setActiveTab('comments')}
-              className={`admin-panel-tab ${activeTab === 'comments' ? 'active' : ''}`}
-            >
-              Comments
-            </button>
-          </nav>
-          <button onClick={loadData} className="btn-refresh">
-            Refresh
+    <div className="admin-container">
+      <header className="admin-header-toolbar">
+        <Link to="/" className="header-logo-link">
+          <img src={Logo} alt="Manchester Gents Logo" className="header-logo" />
+        </Link>
+        <h1 className="admin-title">Admin: {slug}</h1>
+        <div className="admin-tabs">
+          <button
+            onClick={() => setActiveTab('photos')}
+            className={`admin-tab-button ${activeTab === 'photos' ? 'active' : ''}`}
+            aria-label="Photos tab"
+          >
+            Photos
+          </button>
+          <button
+            onClick={() => setActiveTab('comments')}
+            className={`admin-tab-button ${activeTab === 'comments' ? 'active' : ''}`}
+            aria-label="Comments tab"
+          >
+            Comments
           </button>
         </div>
+        <button
+          onClick={loadData}
+          className="admin-refresh-btn"
+          aria-label="Refresh"
+          title="Refresh"
+        >
+          <FaSyncAlt />
+        </button>
       </header>
 
       {activeTab === 'photos' ? (
         <>
-          <div className="bulk-delete-container">
-            <button
-              onClick={handleBulkDeletePhotos}
-              disabled={loading || !selectedPhotoIds.size}
-              className="btn-delete"
-            >
-              {loading ? 'Deleting…' : `Delete Photos (${selectedPhotoIds.size})`}
-            </button>
-          </div>
+          <button
+            onClick={handleBulkDeletePhotos}
+            disabled={loading || !selectedPhotoIds.size}
+            className="admin-bulk-delete-btn"
+            aria-label={`Delete Photos (${selectedPhotoIds.size})`}
+          >
+            {loading ? 'Deleting…' : `Delete Photos (${selectedPhotoIds.size})`}
+          </button>
           <SelectableGroup
             ref={groupRef}
-            className="photo-grid"
+            className="admin-photos-grid"
             clickClassName="tick"
             selectionClassName="selection-rectangle"
             enableDeselect
@@ -225,7 +232,7 @@ export default function AdminPanel({ apiBase }) {
             allowClickWithoutSelected
           >
             {photos.map(photo => (
-              <div key={photo._id} className="photo-grid-item group">
+              <div key={photo._id} className="admin-photo-card">
                 <SelectablePhoto
                   photo={photo}
                   isSelected={selectedPhotoIds.has(photo._id)}
@@ -234,8 +241,9 @@ export default function AdminPanel({ apiBase }) {
                 <button
                   onClick={() => handleDeletePhoto(photo._id)}
                   className="btn-delete-single"
+                  aria-label={`Delete photo ${photo._id}`}
                 >
-                  Delete
+                  <FaTrashAlt />
                 </button>
               </div>
             ))}
@@ -243,15 +251,14 @@ export default function AdminPanel({ apiBase }) {
         </>
       ) : (
         <>
-          <div className="bulk-delete-container">
-            <button
-              onClick={handleBulkDeleteComments}
-              disabled={loading || !selectedCommentIds.size}
-              className="btn-delete"
-            >
-              {loading ? 'Deleting…' : `Delete Comments (${selectedCommentIds.size})`}
-            </button>
-          </div>
+          <button
+            onClick={handleBulkDeleteComments}
+            disabled={loading || !selectedCommentIds.size}
+            className="admin-bulk-delete-btn"
+            aria-label={`Delete Comments (${selectedCommentIds.size})`}
+          >
+            {loading ? 'Deleting…' : `Delete Comments (${selectedCommentIds.size})`}
+          </button>
           <div className="comment-list">
             {comments.map(c => {
               const sel = selectedCommentIds.has(c._id)
@@ -261,6 +268,7 @@ export default function AdminPanel({ apiBase }) {
                     type="checkbox"
                     checked={sel}
                     onChange={() => toggleCommentSelect(c._id)}
+                    aria-label={`Select comment by ${c.name}`}
                   />
                   <img
                     src={urlFor(c.photo.image).width(80).height(80).fit('crop').url()}
@@ -274,8 +282,9 @@ export default function AdminPanel({ apiBase }) {
                       <button
                         onClick={() => handleDeleteComment(c._id)}
                         className="btn-delete-comment"
+                        aria-label={`Delete comment by ${c.name}`}
                       >
-                        Delete
+                        <FaTrashAlt />
                       </button>
                     </div>
                     <p className="comment-message">{c.message}</p>
