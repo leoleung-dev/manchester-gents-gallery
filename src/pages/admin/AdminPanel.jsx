@@ -44,30 +44,35 @@ export default function AdminPanel({ apiBase }) {
   const BASE = apiBase || import.meta.env.VITE_API_BASE || ''
 
   // Combined load function
-  const loadData = useCallback(async () => {
-    try {
-      const [fetchedPhotos, fetchedComments] = await Promise.all([
-        client.fetch(
-          `*[_type=="photo" && eventSlug==$slug]{
-             _id,image,createdAt
-           }|order(createdAt desc)`,
-          { slug }
-        ),
-        client.fetch(
-          `*[_type=="comment" && photo->eventSlug==$slug]{
-             _id,name,instagram,message,createdAt,photo->{image}
-           }|order(createdAt desc)`,
-          { slug }
-        ),
-      ])
-      setPhotos(fetchedPhotos)
-      setComments(fetchedComments)
-      setSelectedPhotoIds(new Set())
-      setSelectedCommentIds(new Set())
-    } catch (err) {
-      console.error('loadData error:', err)
-    }
-  }, [slug])
+const loadData = useCallback(async () => {
+  try {
+    const [fetchedPhotos, fetchedComments] = await Promise.all([
+      client.fetch(
+        `*[_type=="photo" && eventSlug==$slug]{
+           _id, image, takenAt, _createdAt
+         } | order(takenAt asc)`,
+        { slug }
+      ),
+      client.fetch(
+        `*[_type=="comment" && photo->eventSlug==$slug]{
+           _id, name, instagram, message, createdAt, photo->{image}
+         } | order(createdAt desc)`,
+        { slug }
+      ),
+    ])
+    setPhotos(
+      fetchedPhotos.map(p => ({
+        ...p,
+        dateTaken: new Date(p.takenAt || p._createdAt),
+      }))
+    )
+    setComments(fetchedComments)
+    setSelectedPhotoIds(new Set())
+    setSelectedCommentIds(new Set())
+  } catch (err) {
+    console.error('loadData error:', err)
+  }
+}, [slug])
 
   // initial & slug-change load
   useEffect(() => {
