@@ -1,12 +1,12 @@
 // generate-og-html.js
-import fs from 'fs';
-import path from 'path';
-import { createClient } from '@sanity/client';
+import fs from "fs";
+import path from "path";
+import { createClient } from "@sanity/client";
 
 const client = createClient({
-  projectId: 'ulu3s1tc',
-  dataset: 'production',
-  apiVersion: '2023-08-03',
+  projectId: "ulu3s1tc",
+  dataset: "production",
+  apiVersion: "2023-08-03",
   useCdn: true,
 });
 
@@ -21,8 +21,8 @@ async function run() {
   for (const event of events) {
     if (!event.slug) continue;
 
-    const dirPath = path.join('dist', 'event', event.slug);
-    const filePath = path.join(dirPath, 'index.html');
+    const dirPath = path.join("dist", "event", event.slug, "share");
+    const filePath = path.join(dirPath, "index.html");
 
     const html = `<!DOCTYPE html>
 <html lang="en">
@@ -36,23 +36,30 @@ async function run() {
     <meta property="og:description" content="See all the best shots from ${event.title}!" />
     <meta property="og:image" content="https://mg-og-generator.vercel.app/api/og?slug=${event.slug}" />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://photos.manchestergents.com/event/${event.slug}" />
+    <meta property="og:url" content="https://photos.manchestergents.com/share/${event.slug}" />
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Manchester Gents | View photos from: ${event.title}" />
     <meta name="twitter:description" content="See all the best shots from ${event.title}!" />
     <meta name="twitter:image" content="https://mg-og-generator.vercel.app/api/og?slug=${event.slug}" />
+
+    <!-- Redirect for human users -->
+    <script>
+      if (!/bot|crawl|spider|facebookexternalhit|slack|discord|twitterbot|linkedin|whatsapp|opengraph/i.test(navigator.userAgent)) {
+        window.location.replace("/event/${event.slug}");
+      }
+    </script>
   </head>
   <body></body>
 </html>`;
 
     fs.mkdirSync(dirPath, { recursive: true });
-    fs.writeFileSync(filePath, html, 'utf-8');
+    fs.writeFileSync(filePath, html, "utf-8");
     console.log(`✅ Wrote ${filePath}`);
   }
 }
 
 run().catch((err) => {
-  console.error('❌ Failed to generate OG HTML:', err);
+  console.error("❌ Failed to generate OG HTML:", err);
 });

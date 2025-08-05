@@ -13,16 +13,8 @@
   ],
   "routes": [
     {
-      "src": "/event/(?<slug>[^/]+)",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i)(bot|crawl|spider|slack|discord|facebookexternalhit|twitterbot|linkedin|whatsapp|opengraph)"
-        }
-      ],
-      "check": true,
-      "dest": "/event/$slug/index.html"
+      "src": "/share/(?<slug>[^/]+)",
+      "dest": "/share/$slug/index.html"
     },
     { "handle": "filesystem" },
     {

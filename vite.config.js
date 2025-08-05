@@ -1,9 +1,10 @@
 // vite.config.js
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import path from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
+  base: '/', // ✅ important: make sure this is explicitly set to root
   plugins: [react()],
   resolve: {
     alias: {
@@ -17,12 +18,10 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // vercel dev server
+        target: 'http://localhost:3000',
         changeOrigin: true,
         secure: false,
       },
     },
   },
-  // Optional base path if deploying under a subfolder:
-  // base: '/photos/26Jul2025/',
-})
+});
