@@ -24,13 +24,15 @@
       "dest": "/event/$slug/index.html"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1.js"
+      "handle": "filesystem"
     },
-    { "handle": "filesystem" },
     {
       "src": "/event/(?<slug>[^/]+)",
       "dest": "/index.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1.js"
     },
     {
       "src": "/(.*)",
