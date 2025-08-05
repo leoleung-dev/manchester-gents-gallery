@@ -41,7 +41,7 @@ export default async function handler(req, res) {
       { id }
     )
 
-    // 3. Create a Sanity transaction
+    // 3. Create a transaction to delete comments and photo
     const tx = client.transaction()
 
     // 3a. Delete all referencing comments (and their drafts)
@@ -54,13 +54,13 @@ export default async function handler(req, res) {
     tx.delete(id)
     tx.delete(`drafts.${id}`)
 
-    // 3c. Delete the image asset itself
-    if (assetRef) {
-      tx.delete(assetRef)
-    }
-
-    // 4. Commit the transaction
+    // 4. Commit the transaction (comments + photo)
     await tx.commit({ retry: 3 })
+
+    // 5. Delete the image asset separately (now unreferenced)
+    if (assetRef) {
+      await client.delete(assetRef)
+    }
 
     return res.status(200).json({ success: true })
   } catch (err) {

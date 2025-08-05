@@ -7,7 +7,7 @@ const client = createClient({
   projectId: "ulu3s1tc",
   dataset: "production",
   apiVersion: "2023-08-03",
-  useCdn: true,
+  useCdn: false,
 });
 
 async function run() {
