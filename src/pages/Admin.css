@@ -1,0 +1,182 @@
+/* Admin Container */
+.admin-container {
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.admin-inner {
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* Return Home Button */
+.admin-home-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #2d4059;
+  border: 2px solid #ffd460;
+  color: #ffd460;
+  font-size: 1rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  text-decoration: none;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+  width: auto;
+}
+
+.admin-home-button:hover {
+  background-color: #364e6e;
+  box-shadow: 0 0 0 2px #ffd46040;
+}
+
+.admin-home-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #ffd46080;
+}
+
+/* Titles */
+.admin-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #ffd460;
+}
+
+.admin-section-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #ffd460;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Section Card */
+.admin-section {
+  width: 100%;
+  padding: 2rem;
+  background: #2d4059;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Form Elements */
+.admin-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-input,
+.admin-input-date {
+  flex: 1 1 200px;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  background-color: #1c2837;
+  color: #ffd460;
+  border: 1px solid #3e587b;
+  border-radius: 6px;
+}
+
+.admin-form-actions {
+  display: flex;
+  justify-content: center;
+}
+
+/* Button */
+.admin-button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background-color: #ffc62d;
+  color: #1c2837;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  white-space: nowrap;
+  width: auto;
+  transition: background-color 0.2s ease;
+}
+
+.admin-button:hover {
+  background-color: #ffc000;
+}
+
+.admin-button:disabled {
+  background-color: #ffc62d;
+  color: #1c2837;
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Icon inside button */
+/* Align icons and text more precisely in buttons */
+.admin-button-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.admin-button-icon {
+  display: inline-block;
+  font-size: 1.1rem;
+  line-height: 1;
+  transform: translateY(1px);
+}
+
+/* JSON output */
+.admin-output {
+  margin-top: 1rem;
+  background-color: #1c2837;
+  color: #ffd460;
+  padding: 1rem;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+/* Button inner wrapper */
+.admin-button-content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+
+/* Ensure large button inherits all base layout */
+.admin-button.large {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  width: auto;
+}

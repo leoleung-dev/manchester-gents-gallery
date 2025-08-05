@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./Admin.css";
 
 export default function Admin() {
   const [title, setTitle] = useState("");
@@ -56,134 +57,110 @@ export default function Admin() {
     }
   };
 
+const formatTitleFromDate = (dateStr) => {
+  const date = new Date(dateStr);
+  const day = date.getDate();
+  const month = date.toLocaleString("en-GB", { month: "long" });
+  const year = date.getFullYear();
+  return `${day} ${month}, ${year}`;
+};
+
+  const formatSlugFromDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("en-GB", { month: "short" });
+    const year = date.getFullYear();
+    return `${day}${month}${year}`;
+  };
+
+  const handleDateChange = (e) => {
+    const selected = e.target.value;
+    if (!selected) return;
+
+    setTitle(formatTitleFromDate(selected));
+    setSlug(formatSlugFromDate(selected));
+  };
+
   return (
-    <div
-      style={{
-        padding: "3rem",
-        fontFamily: "sans-serif",
-        backgroundColor: "#1c2837",
-        color: "#ffd460",
-        minHeight: "100vh",
-      }}
-    >
-      <h1 style={{ fontSize: "2.5rem", marginBottom: "2rem" }}>🛠 Admin Panel</h1>
-
-      {/* Create Event */}
-      <section
-        style={{
-          marginBottom: "4rem",
-          padding: "2rem",
-          background: "#2d4059",
-          borderRadius: "10px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h2 style={{ fontSize: "1.5rem" }}>📅 Create New Event</h2>
-        <div style={{ marginTop: "1rem", display: "flex", flexWrap: "wrap", gap: "1rem" }}>
-          <input
-            placeholder="Event title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{
-              padding: "0.75rem",
-              width: "300px",
-              borderRadius: "6px",
-              border: "none",
-              fontSize: "1rem",
-            }}
-          />
-          <input
-            placeholder="Slug (e.g. 26Jul2025)"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            style={{
-              padding: "0.75rem",
-              width: "200px",
-              borderRadius: "6px",
-              border: "none",
-              fontSize: "1rem",
-            }}
-          />
+    <div className="admin-container">
+      <main className="admin-inner">
+        {/* Return Home Button */}
+        <nav className="admin-nav">
           <button
-            onClick={handleCreateEvent}
-            style={{
-              padding: "0.75rem 1.5rem",
-              background: "#ffc62d",
-              color: "#1c2837",
-              border: "none",
-              borderRadius: "6px",
-              fontWeight: "bold",
-              cursor: "pointer",
-              fontSize: "1rem",
-            }}
+            className="admin-home-button"
+            onClick={() => (window.location.href = "/")}
           >
-            ➕ Create Event
+            <span className="admin-button-content">
+              <span className="admin-button-icon">⬅️</span>
+              <span>Return Home</span>
+            </span>
           </button>
-        </div>
+        </nav>
 
-        {createStatus && (
-          <pre
-            style={{
-              marginTop: "1rem",
-              background: "#1c2837",
-              color: "#ffe293",
-              padding: "1rem",
-              borderRadius: "6px",
-              fontSize: "0.9rem",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            }}
-          >
-            {JSON.stringify(createStatus, null, 2)}
-          </pre>
-        )}
-      </section>
+        {/* Header */}
+        <header className="admin-header">
+          <h1 className="admin-title">🛠 Admin Panel</h1>
+        </header>
 
-      {/* Trigger Vercel Deploy */}
-      <section
-        style={{
-          padding: "2rem",
-          background: "#2d4059",
-          borderRadius: "10px",
-          boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h2 style={{ fontSize: "1.5rem" }}>🔄 Regenerate All OG HTML</h2>
-        <button
-          onClick={handleTriggerDeploy}
-          disabled={loading}
-          style={{
-            marginTop: "1rem",
-            padding: "1rem 2rem",
-            background: "#ffc62d",
-            color: "#1c2837",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "1.25rem",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          {loading ? "Triggering..." : "Trigger Vercel Deploy"}
-        </button>
+        {/* Create Event Section */}
+        <section className="admin-section">
+          <h2 className="admin-section-title">📅 Create New Event</h2>
+          <div className="admin-form-row">
+            <input
+              type="date"
+              onChange={handleDateChange}
+              className="admin-input-date"
+            />
+            <input
+              placeholder="Event title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="admin-input"
+            />
+            <input
+              placeholder="Slug (e.g. 26Jul2025)"
+              value={slug}
+              onChange={(e) => setSlug(e.target.value)}
+              className="admin-input"
+            />
+          </div>
+          <div className="admin-form-actions">
+            <button onClick={handleCreateEvent} className="admin-button">
+              <span className="admin-button-content">
+                <span className="admin-button-icon">➕</span>
+                <span>Create Event</span>
+              </span>
+            </button>
+          </div>
+          {createStatus && (
+            <pre className="admin-output">
+              {JSON.stringify(createStatus, null, 2)}
+            </pre>
+          )}
+        </section>
 
-        {deployStatus && (
-          <pre
-            style={{
-              marginTop: "1rem",
-              background: "#1c2837",
-              color: "#ffe293",
-              padding: "1rem",
-              borderRadius: "6px",
-              fontSize: "0.9rem",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-            }}
-          >
-            {JSON.stringify(deployStatus, null, 2)}
-          </pre>
-        )}
-      </section>
+        {/* Deploy Section */}
+        <section className="admin-section">
+          <h2 className="admin-section-title">🔄 Regenerate All OG HTML</h2>
+          <div className="admin-form-actions">
+            <button
+              onClick={handleTriggerDeploy}
+              disabled={loading}
+              className="admin-button large"
+            >
+              <span className="admin-button-content">
+                <span className="admin-button-icon">🚀</span>
+                <span>{loading ? "Triggering..." : "Trigger Vercel Deploy"}</span>
+              </span>
+            </button>
+          </div>
+          {deployStatus && (
+            <pre className="admin-output">
+              {JSON.stringify(deployStatus, null, 2)}
+            </pre>
+          )}
+        </section>
+      </main>
     </div>
   );
 }
