@@ -43,6 +43,13 @@ async function run() {
       <meta name="twitter:title" content="Manchester Gents | View photos from: ${event.title}" />
       <meta name="twitter:description" content="See all the best shots from ${event.title}!" />
       <meta name="twitter:image" content="https://mg-og-generator.vercel.app/api/og?slug=${event.slug}" />
+
+      <!-- Redirect script for non-bots -->
+      <script>
+        if (!/bot|crawl|spider|facebookexternalhit|slack|discord|twitterbot|linkedin|whatsapp|opengraph/i.test(navigator.userAgent)) {
+          window.location.replace("/event/${event.slug}");
+        }
+      </script>
     </head>
     <body></body>
   </html>`;
