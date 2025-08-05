@@ -1,7 +1,8 @@
 export default function setCorsHeaders(res) {
   const allowedOrigins = [
     'http://localhost:5173',
-    'https://photos.manchestergents.com'
+    'https://photos.manchestergents.com',
+    'http://localhost:3000'
   ];
 
   const origin = res.req?.headers?.origin;
