@@ -14,6 +14,15 @@ const sanity = createClient({
 });
 const urlFor = (source) => imageUrlBuilder(sanity).image(source);
 
+// 🧠 Try parsing event title like "26 April, 2025" to Date object
+function parseEventDate(title = "") {
+  try {
+    return new Date(title.replace(",", ""));
+  } catch {
+    return null;
+  }
+}
+
 export default function Home({ apiBase }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +39,16 @@ export default function Home({ apiBase }) {
         const res = await fetch(`${API}/api/getEventSlugs`);
         if (!res.ok) throw new Error(`Failed: ${res.status}`);
         const data = await res.json();
-        setEvents(data);
+
+        // ✅ Sort by parsed date (descending)
+        const sorted = [...data].sort((a, b) => {
+          const dateA = parseEventDate(a.title);
+          const dateB = parseEventDate(b.title);
+
+          return (dateB?.getTime() ?? 0) - (dateA?.getTime() ?? 0);
+        });
+
+        setEvents(sorted);
       } catch (err) {
         console.error("Failed to fetch event slugs:", err);
         setError("⚠️ Could not load events. Please try again later.");
