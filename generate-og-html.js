@@ -11,11 +11,6 @@ const client = createClient({
 });
 
 async function run() {
-  if (process.env.VERCEL) {
-    console.log("⚠️ Skipping OG HTML generation on Vercel build.");
-    return;
-  }
-
   const events = await client.fetch(`
     *[_type == "event"]{
       title,
