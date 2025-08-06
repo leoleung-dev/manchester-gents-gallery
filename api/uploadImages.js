@@ -21,7 +21,7 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end()
 
-  const uploadServerUrl = 'https://manchestergents-uploadserver.up.railway.app/upload'
+  const uploadServerUrl = 'https://mg-fly-uploadserver.fly.dev/upload'
 
   try {
     // Proxy upload to your upload server
