@@ -128,7 +128,7 @@ export default function EventGallery({ apiBase }) {
         form.append("eventSlug", slug);
 
         const res = await fetch(
-          "https://manchester-gents-gallery-uploadserver-production.up.railway.app/upload",
+          `${API}/api/uploadImages?eventSlug=${encodeURIComponent(slug)}`,
           {
             method: "POST",
             body: form,
