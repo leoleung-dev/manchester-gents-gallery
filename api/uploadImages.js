@@ -24,10 +24,15 @@ export default async function handler(req, res) {
   const uploadServerUrl = 'https://mg-fly-uploadserver.fly.dev/upload'
 
   try {
-    // Proxy upload to your upload server
+    // Proxy upload to your upload server (streamed)
+    const forwardHeaders = {}
+    if (req.headers['content-type']) forwardHeaders['content-type'] = req.headers['content-type']
+
     const proxyRes = await fetch(uploadServerUrl, {
       method: 'POST',
-      headers: req.headers,
+      headers: forwardHeaders,
+      // Node fetch requires duplex when sending a readable stream
+      duplex: 'half',
       body: req,
     })
 
@@ -36,7 +41,13 @@ export default async function handler(req, res) {
       return res.status(proxyRes.status).json({ error: errorText })
     }
 
-    const uploadData = await proxyRes.json()
+    let uploadData
+    const text = await proxyRes.text()
+    try {
+      uploadData = JSON.parse(text)
+    } catch {
+      uploadData = { raw: text }
+    }
 
     // Get eventSlug from query or headers or req somehow (adjust as per your client request)
     const eventSlug = req.query.eventSlug || req.headers['x-event-slug'] || null
@@ -66,7 +77,7 @@ export default async function handler(req, res) {
         _type: 'image',
         asset: {
           _type: 'reference',
-          _ref: uploadData.assetId || uploadData.asset._ref || uploadData.asset._id,
+          _ref: uploadData.assetId || uploadData?.asset?._ref || uploadData?.asset?._id,
         },
       },
     }

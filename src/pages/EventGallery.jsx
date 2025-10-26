@@ -128,9 +128,12 @@ export default function EventGallery({ apiBase }) {
         form.append("eventSlug", slug);
 
         const res = await fetch(
-          `${API}/api/uploadImages?eventSlug=${encodeURIComponent(slug)}`,
+          "https://mg-fly-uploadserver.fly.dev/upload",
           {
             method: "POST",
+            headers: {
+              "x-event-slug": slug,
+            },
             body: form,
           }
         );
