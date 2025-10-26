@@ -21,6 +21,8 @@ export default function EventGallery({ apiBase }) {
   const fileInputRef = useRef(null);
 
   const API = apiBase || "";
+  const UPLOAD_SERVER =
+    import.meta.env.VITE_UPLOAD_SERVER_URL || "https://mg-fly-uploadserver.fly.dev";
 
   const loadPhotos = useCallback(async () => {
     try {
@@ -128,7 +130,7 @@ export default function EventGallery({ apiBase }) {
         form.append("eventSlug", slug);
 
         const res = await fetch(
-          "https://mg-fly-uploadserver.fly.dev/upload",
+          `${UPLOAD_SERVER}/upload`,
           {
             method: "POST",
             headers: {
@@ -141,8 +143,10 @@ export default function EventGallery({ apiBase }) {
         if (res.ok) {
           successCount++;
         } else {
-          const err = await res.json().catch(() => ({}));
-          console.error("Upload error:", err);
+          const cloned = res.clone();
+          const errJson = await res.json().catch(() => null);
+          const errText = await cloned.text().catch(() => null);
+          console.error("Upload error:", errJson || errText || res.statusText, res.status);
         }
 
         setUploadProgress(Math.round(((i + 1) / files.length) * 100));
