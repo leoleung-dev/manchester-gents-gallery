@@ -58,12 +58,12 @@ export default function EventGallery({ apiBase }) {
           originalUrl: urlFor(p.image).url(),
           dateTaken: new Date(p.takenAt || p._createdAt),
           uploaderName: p.uploaderName || "",
-        }))
+        })),
       );
 
       setSelectedIds(
         (prev) =>
-          new Set([...prev].filter((id) => data.some((x) => x._id === id)))
+          new Set([...prev].filter((id) => data.some((x) => x._id === id))),
       );
     } catch (err) {
       console.error("Failed to fetch photos", err);
@@ -124,7 +124,7 @@ export default function EventGallery({ apiBase }) {
         } catch (err) {
           console.error("Error fetching for ZIP", id, err);
         }
-      })
+      }),
     );
 
     const content = await zip.generateAsync({ type: "blob" });
@@ -140,7 +140,7 @@ export default function EventGallery({ apiBase }) {
     if (!uploaderName.trim()) {
       setFeedback({
         type: "error",
-        message: "Please add your name before uploading.",
+        message: "Please add your name and Instagram handle (Name @handle).",
       });
       setTimeout(() => setFeedback(null), 3000);
       return;
@@ -168,7 +168,7 @@ export default function EventGallery({ apiBase }) {
               "x-uploader-name": uploaderName,
             },
             body: form,
-          }
+          },
         );
 
         if (res.ok) {
@@ -177,21 +177,25 @@ export default function EventGallery({ apiBase }) {
           const cloned = res.clone();
           const errJson = await res.json().catch(() => null);
           const errText = await cloned.text().catch(() => null);
-          console.error("Upload error:", errJson || errText || res.statusText, res.status);
+          console.error(
+            "Upload error:",
+            errJson || errText || res.statusText,
+            res.status,
+          );
         }
 
         setUploadProgress(Math.round(((i + 1) / uploadFiles.length) * 100));
       }
 
-        if (successCount > 0) {
-          setFeedback({
-            type: "success",
-            message: `${successCount} image(s) uploaded!`,
-          });
-          await loadPhotos();
-        } else {
-          throw new Error("All uploads failed.");
-        }
+      if (successCount > 0) {
+        setFeedback({
+          type: "success",
+          message: `${successCount} image(s) uploaded!`,
+        });
+        await loadPhotos();
+      } else {
+        throw new Error("All uploads failed.");
+      }
     } catch (err) {
       console.error("Upload error:", err);
       setFeedback({ type: "error", message: err.message || "Upload failed" });
@@ -225,7 +229,7 @@ export default function EventGallery({ apiBase }) {
   const confirmUploaderPrompt = () => {
     const trimmed = pendingUploaderName.trim();
     if (!trimmed) {
-      setUploaderError("Please enter a name.");
+      setUploaderError("Please enter your name and Instagram handle.");
       return;
     }
     setUploaderName(trimmed);
@@ -309,11 +313,14 @@ export default function EventGallery({ apiBase }) {
         <div className="uploader-overlay" role="dialog" aria-modal="true">
           <div className="uploader-modal">
             <h2>Who is uploading these photos?</h2>
-            <p>This name will show next to the upload time.</p>
+            <p>
+              This will show next to the upload time. <br />
+              Format: Name @InstagramHandle.
+            </p>
             <input
               ref={uploaderInputRef}
               type="text"
-              placeholder="Your name"
+              placeholder="Name @InstagramHandle"
               value={pendingUploaderName}
               onChange={(e) => setPendingUploaderName(e.target.value)}
               onKeyDown={(e) => {
