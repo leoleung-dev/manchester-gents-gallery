@@ -36,5 +36,10 @@ export default {
       type: 'string',
       readOnly: true,
     },
+    {
+      name: 'uploaderName',
+      title: 'Uploader Name',
+      type: 'string',
+    },
   ],
 }

@@ -3,7 +3,7 @@
   "name": "manchester-gents-gallery-full",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build && node generate-og-html.js",
     "preview": "vite preview"
   },

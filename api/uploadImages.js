@@ -51,6 +51,8 @@ export default async function handler(req, res) {
 
     // Get eventSlug from query or headers or req somehow (adjust as per your client request)
     const eventSlug = req.query.eventSlug || req.headers['x-event-slug'] || null
+    const uploaderName =
+      req.query.uploaderName || req.headers['x-uploader-name'] || null
 
     if (!eventSlug) {
       return res.status(400).json({ error: 'Missing eventSlug in request' })
@@ -80,6 +82,10 @@ export default async function handler(req, res) {
           _ref: uploadData.assetId || uploadData?.asset?._ref || uploadData?.asset?._id,
         },
       },
+    }
+    const trimmedUploader = typeof uploaderName === 'string' ? uploaderName.trim() : ''
+    if (trimmedUploader) {
+      photoDoc.uploaderName = trimmedUploader
     }
 
     // Create photo document in Sanity

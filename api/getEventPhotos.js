@@ -31,7 +31,8 @@ export default async function handler(req, res) {
           _id,
           image,
           takenAt,
-          _createdAt
+          _createdAt,
+          uploaderName
         }`,
       { slug }
     )

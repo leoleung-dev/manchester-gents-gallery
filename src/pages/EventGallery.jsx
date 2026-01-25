@@ -18,11 +18,26 @@ export default function EventGallery({ apiBase }) {
   const [uploading, setUploading] = useState(false);
   const [feedback, setFeedback] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploaderName, setUploaderName] = useState(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("uploaderName") || "";
+  });
+  const [pendingUploaderName, setPendingUploaderName] = useState("");
+  const [uploaderError, setUploaderError] = useState("");
+  const [showUploaderPrompt, setShowUploaderPrompt] = useState(false);
   const fileInputRef = useRef(null);
+  const uploaderInputRef = useRef(null);
 
   const API = apiBase || "";
-  const UPLOAD_SERVER =
-    import.meta.env.VITE_UPLOAD_SERVER_URL || "https://mg-fly-uploadserver.fly.dev";
+  const UPLOAD_ENDPOINT = `${API}/api/uploadImages`;
+
+  useEffect(() => {
+    if (showUploaderPrompt) {
+      setPendingUploaderName(uploaderName);
+      setUploaderError("");
+      setTimeout(() => uploaderInputRef.current?.focus(), 0);
+    }
+  }, [showUploaderPrompt, uploaderName]);
 
   const loadPhotos = useCallback(async () => {
     try {
@@ -37,6 +52,7 @@ export default function EventGallery({ apiBase }) {
           url: urlFor(p.image).width(1000).auto("format").url(),
           originalUrl: urlFor(p.image).url(),
           dateTaken: new Date(p.takenAt || p._createdAt),
+          uploaderName: p.uploaderName || "",
         }))
       );
 
@@ -115,6 +131,14 @@ export default function EventGallery({ apiBase }) {
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
+    if (!uploaderName.trim()) {
+      setFeedback({
+        type: "error",
+        message: "Please add your name before uploading.",
+      });
+      setTimeout(() => setFeedback(null), 3000);
+      return;
+    }
 
     setUploading(true);
     setUploadProgress(0);
@@ -130,11 +154,12 @@ export default function EventGallery({ apiBase }) {
         form.append("eventSlug", slug);
 
         const res = await fetch(
-          `${UPLOAD_SERVER}/upload`,
+          `${UPLOAD_ENDPOINT}?eventSlug=${encodeURIComponent(slug)}`,
           {
             method: "POST",
             headers: {
               "x-event-slug": slug,
+              "x-uploader-name": uploaderName,
             },
             body: form,
           }
@@ -187,6 +212,29 @@ export default function EventGallery({ apiBase }) {
     480: 2,
   };
 
+  const openUploaderPrompt = () => {
+    setShowUploaderPrompt(true);
+  };
+
+  const confirmUploaderPrompt = () => {
+    const trimmed = pendingUploaderName.trim();
+    if (!trimmed) {
+      setUploaderError("Please enter a name.");
+      return;
+    }
+    setUploaderName(trimmed);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("uploaderName", trimmed);
+    }
+    setShowUploaderPrompt(false);
+    setTimeout(() => fileInputRef.current?.click(), 0);
+  };
+
+  const cancelUploaderPrompt = () => {
+    setShowUploaderPrompt(false);
+    setUploaderError("");
+  };
+
   return (
     <div className="event-gallery-container">
       {uploading && (
@@ -211,7 +259,7 @@ export default function EventGallery({ apiBase }) {
         <h1 className="event-gallery-title">{eventTitle}</h1>
         <div className="event-gallery-buttons">
           <button
-            onClick={() => fileInputRef.current.click()}
+            onClick={openUploaderPrompt}
             disabled={uploading}
             className={`btn-upload ${uploading ? "btn-disabled" : ""}`}
             aria-label="Upload Images"
@@ -251,6 +299,37 @@ export default function EventGallery({ apiBase }) {
         onChange={handleFileChange}
       />
 
+      {showUploaderPrompt && (
+        <div className="uploader-overlay" role="dialog" aria-modal="true">
+          <div className="uploader-modal">
+            <h2>Who is uploading these photos?</h2>
+            <p>This name will show next to the upload time.</p>
+            <input
+              ref={uploaderInputRef}
+              type="text"
+              placeholder="Your name"
+              value={pendingUploaderName}
+              onChange={(e) => setPendingUploaderName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmUploaderPrompt();
+                if (e.key === "Escape") cancelUploaderPrompt();
+              }}
+            />
+            {uploaderError && (
+              <div className="uploader-error">{uploaderError}</div>
+            )}
+            <div className="uploader-actions">
+              <button type="button" onClick={cancelUploaderPrompt}>
+                Cancel
+              </button>
+              <button type="button" onClick={confirmUploaderPrompt}>
+                Continue
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {feedback && (
         <div className={`feedback-message feedback-${feedback.type}`}>
           {feedback.message}
@@ -264,6 +343,24 @@ export default function EventGallery({ apiBase }) {
       >
         {photos.map((photo) => {
           const isSel = selectedIds.has(photo._id);
+          const dateValue =
+            photo.dateTaken instanceof Date &&
+            !Number.isNaN(photo.dateTaken.getTime())
+              ? photo.dateTaken
+              : null;
+          const displayDate = dateValue
+            ? dateValue.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+            : "";
+          const displayTime = dateValue
+            ? dateValue.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "";
           return (
             <div key={photo._id} className="photo-card">
               <input
@@ -283,8 +380,14 @@ export default function EventGallery({ apiBase }) {
                 }`}
               >
                 <img src={photo.thumbnailUrl} alt="" className="photo-image" />
-                <div className="photo-date">
-                  {photo.dateTaken.toLocaleString()}
+              </div>
+              <div className="photo-meta">
+                <div className="photo-uploader">
+                  {photo.uploaderName || "Unknown"}
+                </div>
+                <div className="photo-date-time">
+                  <span>{displayDate}</span>
+                  <span>{displayTime}</span>
                 </div>
               </div>
             </div>

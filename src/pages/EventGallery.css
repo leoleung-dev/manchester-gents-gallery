@@ -69,11 +69,26 @@
   opacity: 0.8;
 }
 
-/* Date text */
-.photo-date {
-  font-size: 0.75rem; /* text-xs */
-  color: #ffd460; /* brand yellow for date */
-  padding: 0.25rem 0.25rem 0 0.25rem;
+/* Photo metadata */
+.photo-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.35rem 0.5rem 0.5rem 0.5rem;
+  background: rgba(28, 40, 55, 0.8);
+}
+
+.photo-uploader {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffd460;
+}
+
+.photo-date-time {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: #f6e2a3;
 }
 
 /* Container for entire gallery page */
@@ -371,4 +386,75 @@ button:disabled {
   height: 1rem;
   overflow: hidden;
   margin-top: 1rem;
+}
+
+.uploader-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(28, 40, 55, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.uploader-modal {
+  background: #1c2837;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  width: min(420px, 90vw);
+  color: #ffd460;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.uploader-modal h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.uploader-modal p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #f6e2a3;
+}
+
+.uploader-modal input {
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ffd46060;
+  background: #2d4059;
+  color: #ffd460;
+  font-size: 0.9rem;
+}
+
+.uploader-error {
+  color: #ffb3b3;
+  font-size: 0.8rem;
+}
+
+.uploader-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.uploader-actions button {
+  width: auto;
+  height: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  border-radius: 0.5rem;
+}
+
+.uploader-actions button:first-of-type {
+  background: #2d4059;
+  color: #ffd460;
+}
+
+.uploader-actions button:last-of-type {
+  background: #ffd460;
+  color: #1c2837;
 }
