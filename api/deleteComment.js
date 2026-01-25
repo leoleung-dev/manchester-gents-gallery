@@ -16,14 +16,21 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end()
 
   try {
-    const { id } = req.body
-    if (!id) throw new Error('Missing id')
+    const { id, ids } = req.body
+    const targets = Array.isArray(ids) ? ids.filter(Boolean) : []
+    if (!targets.length && !id) throw new Error('Missing id')
 
-    await client
-      .transaction()
-      .delete(id)
-      .delete(`drafts.${id}`)
-      .commit({ retry: 3 })
+    const tx = client.transaction()
+    if (targets.length) {
+      targets.forEach((cid) => {
+        tx.delete(cid)
+        tx.delete(`drafts.${cid}`)
+      })
+    } else {
+      tx.delete(id).delete(`drafts.${id}`)
+    }
+
+    await tx.commit({ retry: 3 })
 
     res.status(200).json({ success: true })
   } catch (err) {

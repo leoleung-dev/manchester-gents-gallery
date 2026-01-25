@@ -131,7 +131,7 @@ export default function AdminPanel({ apiBase }) {
     if (!selectedCommentIds.size || !confirm(`Delete ${selectedCommentIds.size} comment(s)?`)) return
     setLoading(true)
     try {
-      await postJson('bulkDeleteComment', { ids: [...selectedCommentIds] })
+      await postJson('deleteComment', { ids: [...selectedCommentIds] })
       setComments(cs => cs.filter(c => !selectedCommentIds.has(c._id)))
       setSelectedCommentIds(new Set())
     } catch (err) {
