@@ -21,14 +21,23 @@ export default async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end()
 
-  const uploadServerUrl = 'https://mg-fly-uploadserver.fly.dev/upload'
+  const eventSlug = req.query.eventSlug || req.headers['x-event-slug'] || null
+  const uploaderName =
+    req.query.uploaderName || req.headers['x-uploader-name'] || null
+  const uploadServerUrl = new URL('https://mg-fly-uploadserver.fly.dev/upload')
+  if (eventSlug) uploadServerUrl.searchParams.set('eventSlug', eventSlug)
+  if (uploaderName) uploadServerUrl.searchParams.set('uploaderName', uploaderName)
 
   try {
     // Proxy upload to your upload server (streamed)
     const forwardHeaders = {}
     if (req.headers['content-type']) forwardHeaders['content-type'] = req.headers['content-type']
+    if (req.headers['x-event-slug']) forwardHeaders['x-event-slug'] = req.headers['x-event-slug']
+    if (req.headers['x-uploader-name']) {
+      forwardHeaders['x-uploader-name'] = req.headers['x-uploader-name']
+    }
 
-    const proxyRes = await fetch(uploadServerUrl, {
+    const proxyRes = await fetch(uploadServerUrl.toString(), {
       method: 'POST',
       headers: forwardHeaders,
       // Node fetch requires duplex when sending a readable stream
@@ -48,11 +57,21 @@ export default async function handler(req, res) {
     } catch {
       uploadData = { raw: text }
     }
-
-    // Get eventSlug from query or headers or req somehow (adjust as per your client request)
-    const eventSlug = req.query.eventSlug || req.headers['x-event-slug'] || null
-    const uploaderName =
-      req.query.uploaderName || req.headers['x-uploader-name'] || null
+    if (uploadData?.docId) {
+      return res.status(201).json({
+        success: true,
+        docId: uploadData.docId,
+        assetId: uploadData?.assetId || null,
+      })
+    }
+    const assetId =
+      uploadData?.assetId || uploadData?.asset?._ref || uploadData?.asset?._id
+    if (!assetId) {
+      return res.status(502).json({
+        error: 'Upload server did not return a valid asset id',
+        details: uploadData,
+      })
+    }
 
     if (!eventSlug) {
       return res.status(400).json({ error: 'Missing eventSlug in request' })
@@ -79,7 +98,7 @@ export default async function handler(req, res) {
         _type: 'image',
         asset: {
           _type: 'reference',
-          _ref: uploadData.assetId || uploadData?.asset?._ref || uploadData?.asset?._id,
+          _ref: assetId,
         },
       },
     }

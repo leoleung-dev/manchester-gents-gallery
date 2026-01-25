@@ -45,8 +45,13 @@ export default function EventGallery({ apiBase }) {
       if (!res.ok) throw new Error(`Failed to fetch photos: ${res.status}`);
       const data = await res.json();
 
+      const validPhotos = data.filter((p) => {
+        const ref = p?.image?.asset?._ref;
+        return typeof ref === "string" && ref.trim().length > 0;
+      });
+
       setPhotos(
-        data.map((p) => ({
+        validPhotos.map((p) => ({
           ...p,
           thumbnailUrl: urlFor(p.image).width(400).auto("format").url(),
           url: urlFor(p.image).width(1000).auto("format").url(),
@@ -131,6 +136,26 @@ export default function EventGallery({ apiBase }) {
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
+    const isHeic = (file) => {
+      const type = (file.type || "").toLowerCase();
+      const name = (file.name || "").toLowerCase();
+      return (
+        type.includes("heic") ||
+        type.includes("heif") ||
+        name.endsWith(".heic") ||
+        name.endsWith(".heif")
+      );
+    };
+    const blockedFiles = files.filter(isHeic);
+    const uploadFiles = files.filter((file) => !isHeic(file));
+    if (blockedFiles.length > 0) {
+      setFeedback({
+        type: "error",
+        message: "HEIC/HEIF images are not supported yet. Convert to JPG/PNG.",
+      });
+      setTimeout(() => setFeedback(null), 4000);
+    }
+    if (!uploadFiles.length) return;
     if (!uploaderName.trim()) {
       setFeedback({
         type: "error",
@@ -147,8 +172,8 @@ export default function EventGallery({ apiBase }) {
     let successCount = 0;
 
     try {
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (let i = 0; i < uploadFiles.length; i++) {
+        const file = uploadFiles[i];
         const form = new FormData();
         form.append("file", file);
         form.append("eventSlug", slug);
@@ -174,18 +199,18 @@ export default function EventGallery({ apiBase }) {
           console.error("Upload error:", errJson || errText || res.statusText, res.status);
         }
 
-        setUploadProgress(Math.round(((i + 1) / files.length) * 100));
+        setUploadProgress(Math.round(((i + 1) / uploadFiles.length) * 100));
       }
 
-      if (successCount > 0) {
-        setFeedback({
-          type: "success",
-          message: `${successCount} image(s) uploaded!`,
-        });
-        await loadPhotos();
-      } else {
-        throw new Error("All uploads failed.");
-      }
+        if (successCount > 0) {
+          setFeedback({
+            type: "success",
+            message: `${successCount} image(s) uploaded!`,
+          });
+          await loadPhotos();
+        } else {
+          throw new Error("All uploads failed.");
+        }
     } catch (err) {
       console.error("Upload error:", err);
       setFeedback({ type: "error", message: err.message || "Upload failed" });
