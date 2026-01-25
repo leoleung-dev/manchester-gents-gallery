@@ -1,12 +1,6 @@
-import { createClient } from "@sanity/client";
-
-const client = createClient({
-  projectId: process.env.SANITY_PROJECT_ID,
-  dataset: process.env.SANITY_DATASET,
-  token: process.env.SANITY_API_TOKEN,
-  useCdn: false,
-  apiVersion: "2023-08-03",
-});
+const API_VERSION = "2023-08-03";
+const DEFAULT_SANITY_PROJECT_ID = "ulu3s1tc";
+const DEFAULT_SANITY_DATASET = "production";
 
 const SITE_URL = process.env.SITE_URL || "https://photos.manchestergents.com";
 
@@ -18,6 +12,30 @@ const escapeHtml = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
+async function fetchEventTitle(slug) {
+  const projectId =
+    process.env.SANITY_PROJECT_ID ||
+    process.env.VITE_SANITY_PROJECT_ID ||
+    DEFAULT_SANITY_PROJECT_ID;
+  const dataset =
+    process.env.SANITY_DATASET ||
+    process.env.VITE_SANITY_DATASET ||
+    DEFAULT_SANITY_DATASET;
+  if (!projectId || !slug) return null;
+
+  const query = '*[_type == "event" && slug.current == $slug][0]{title}';
+  const url = new URL(
+    `https://${projectId}.api.sanity.io/v${API_VERSION}/data/query/${dataset}`
+  );
+  url.searchParams.set("query", query);
+  url.searchParams.set("$slug", slug);
+
+  const res = await fetch(url.toString());
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data?.result?.title || null;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
@@ -28,23 +46,26 @@ export default async function handler(req, res) {
     ? req.query.slug[0]
     : req.query?.slug;
   const slug = typeof slugParam === "string" ? slugParam : "";
+  const imageParam = Array.isArray(req.query?.image)
+    ? req.query.image[0]
+    : req.query?.image;
 
   let title = "Manchester Gents";
   if (slug) {
     try {
-      const event = await client.fetch(
-        '*[_type == "event" && slug.current == $slug][0]{title}',
-        { slug }
-      );
-      if (event?.title) title = event.title;
+      const fetchedTitle = await fetchEventTitle(slug);
+      if (fetchedTitle) title = fetchedTitle;
     } catch (err) {
       console.warn("OG page fetch failed:", err);
     }
   }
 
   const safeTitle = escapeHtml(title);
+  const ogParams = new URLSearchParams();
+  if (slug) ogParams.set("slug", slug);
+  if (imageParam) ogParams.set("image", imageParam);
   const ogImageUrl = `${SITE_URL}/api/og${
-    slug ? `?slug=${encodeURIComponent(slug)}` : ""
+    ogParams.toString() ? `?${ogParams.toString()}` : ""
   }`;
   const pageUrl = slug ? `${SITE_URL}/event/${slug}` : SITE_URL;
   const description = slug

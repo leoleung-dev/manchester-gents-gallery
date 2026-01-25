@@ -2,14 +2,18 @@ import React from "react";
 import { ImageResponse } from "@vercel/og";
 
 const API_VERSION = "2023-08-03";
+const DEFAULT_SANITY_PROJECT_ID = "ulu3s1tc";
+const DEFAULT_SANITY_DATASET = "production";
 
 async function fetchEventData(slug) {
   const projectId =
-    process.env.SANITY_PROJECT_ID || process.env.VITE_SANITY_PROJECT_ID;
+    process.env.SANITY_PROJECT_ID ||
+    process.env.VITE_SANITY_PROJECT_ID ||
+    DEFAULT_SANITY_PROJECT_ID;
   const dataset =
     process.env.SANITY_DATASET ||
     process.env.VITE_SANITY_DATASET ||
-    "production";
+    DEFAULT_SANITY_DATASET;
   if (!projectId || !slug) return null;
 
   const query =
@@ -45,10 +49,11 @@ export default async function handler(req, res) {
   );
   const slug = searchParams.get("slug") || "";
   const debug = searchParams.get("debug") === "1";
+  const imageParam = searchParams.get("image") || "";
   const event = await fetchEventData(slug);
   const title = event?.title || slug || "Manchester Gents";
-  let coverUrl = event?.coverUrl || "";
-  if (coverUrl) {
+  let coverUrl = imageParam || event?.coverUrl || "";
+  if (coverUrl && !imageParam) {
     const cover = new URL(coverUrl);
     cover.searchParams.set("w", "1200");
     cover.searchParams.set("h", "630");
