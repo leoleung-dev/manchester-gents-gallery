@@ -40,6 +40,7 @@ export default async function handler(req, res) {
     `http://${req.headers.host || "localhost"}`
   );
   const slug = searchParams.get("slug") || "";
+  const debug = searchParams.get("debug") === "1";
   const event = await fetchEventData(slug);
   const title = event?.title || slug || "Manchester Gents";
   let coverUrl = event?.coverUrl || "";
@@ -52,7 +53,14 @@ export default async function handler(req, res) {
     cover.searchParams.set("q", "80");
     coverUrl = cover.toString();
   }
-  const coverData = await fetchCoverArrayBuffer(coverUrl);
+  let coverData = null;
+  let coverBytes = 0;
+  try {
+    coverData = await fetchCoverArrayBuffer(coverUrl);
+    coverBytes = coverData ? coverData.byteLength : 0;
+  } catch (err) {
+    console.warn("OG cover buffer failed:", err);
+  }
 
   const imageResponse = new ImageResponse(
     React.createElement(
@@ -134,7 +142,25 @@ export default async function handler(req, res) {
             },
           },
           "View photos from this event"
-        )
+        ),
+        debug
+          ? React.createElement(
+              "div",
+              {
+                style: {
+                  marginTop: 36,
+                  padding: "12px 16px",
+                  borderRadius: 8,
+                  background: "rgba(0,0,0,0.5)",
+                  color: "#ffffff",
+                  fontSize: 20,
+                  lineHeight: 1.4,
+                  maxWidth: "90%",
+                },
+              },
+              `debug: coverUrl=${coverUrl ? "yes" : "no"} | bytes=${coverBytes}`
+            )
+          : null
       )
     ),
     {
