@@ -1,9 +1,5 @@
 import { ImageResponse } from "@vercel/og";
 
-export const config = {
-  runtime: "edge",
-};
-
 const API_VERSION = "2023-08-03";
 
 async function fetchEventTitle(slug) {
@@ -24,12 +20,15 @@ async function fetchEventTitle(slug) {
   return data?.result?.title || null;
 }
 
-export default async function handler(req) {
-  const { searchParams } = new URL(req.url);
+export default async function handler(req, res) {
+  const { searchParams } = new URL(
+    req.url,
+    `http://${req.headers.host || "localhost"}`
+  );
   const slug = searchParams.get("slug") || "";
   const title = (await fetchEventTitle(slug)) || slug || "Manchester Gents";
 
-  return new ImageResponse(
+  const imageResponse = new ImageResponse(
     (
       <div
         style={{
@@ -74,4 +73,13 @@ export default async function handler(req) {
       height: 630,
     }
   );
+
+  const arrayBuffer = await imageResponse.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  res.setHeader("Content-Type", "image/png");
+  res.setHeader(
+    "Cache-Control",
+    "public, immutable, no-transform, max-age=31536000"
+  );
+  res.status(200).send(buffer);
 }
