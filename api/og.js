@@ -14,6 +14,10 @@ async function fetchEventData(slug) {
     process.env.SANITY_DATASET ||
     process.env.VITE_SANITY_DATASET ||
     DEFAULT_SANITY_DATASET;
+  const token =
+    process.env.SANITY_API_TOKEN ||
+    process.env.VITE_SANITY_READ_TOKEN ||
+    "";
   if (!projectId || !slug) return null;
 
   const query =
@@ -24,7 +28,9 @@ async function fetchEventData(slug) {
   url.searchParams.set("query", query);
   url.searchParams.set("$slug", slug);
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
   if (!res.ok) return null;
   const data = await res.json();
   return data?.result || null;

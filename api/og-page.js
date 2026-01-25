@@ -12,7 +12,7 @@ const escapeHtml = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#39;");
 
-async function fetchEventTitle(slug) {
+async function fetchEventData(slug) {
   const projectId =
     process.env.SANITY_PROJECT_ID ||
     process.env.VITE_SANITY_PROJECT_ID ||
@@ -21,19 +21,26 @@ async function fetchEventTitle(slug) {
     process.env.SANITY_DATASET ||
     process.env.VITE_SANITY_DATASET ||
     DEFAULT_SANITY_DATASET;
+  const token =
+    process.env.SANITY_API_TOKEN ||
+    process.env.VITE_SANITY_READ_TOKEN ||
+    "";
   if (!projectId || !slug) return null;
 
-  const query = '*[_type == "event" && slug.current == $slug][0]{title}';
+  const query =
+    '*[_type == "event" && slug.current == $slug][0]{title, "coverUrl": defaultCoverImage.asset->url}';
   const url = new URL(
     `https://${projectId}.api.sanity.io/v${API_VERSION}/data/query/${dataset}`
   );
   url.searchParams.set("query", query);
   url.searchParams.set("$slug", slug);
 
-  const res = await fetch(url.toString());
+  const res = await fetch(url.toString(), {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
   if (!res.ok) return null;
   const data = await res.json();
-  return data?.result?.title || null;
+  return data?.result || null;
 }
 
 export default async function handler(req, res) {
@@ -46,15 +53,18 @@ export default async function handler(req, res) {
     ? req.query.slug[0]
     : req.query?.slug;
   const slug = typeof slugParam === "string" ? slugParam : "";
-  const imageParam = Array.isArray(req.query?.image)
+  let imageParam = Array.isArray(req.query?.image)
     ? req.query.image[0]
     : req.query?.image;
 
   let title = "Manchester Gents";
   if (slug) {
     try {
-      const fetchedTitle = await fetchEventTitle(slug);
-      if (fetchedTitle) title = fetchedTitle;
+      const event = await fetchEventData(slug);
+      if (event?.title) title = event.title;
+      if (!imageParam && event?.coverUrl) {
+        imageParam = event.coverUrl;
+      }
     } catch (err) {
       console.warn("OG page fetch failed:", err);
     }
