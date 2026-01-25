@@ -162,7 +162,7 @@ export default async function handler(req, res) {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(135deg, rgba(28, 40, 55, 0.8) 0%, rgba(45, 64, 89, 0.75) 60%, rgba(62, 88, 123, 0.7) 100%)",
+            "linear-gradient(180deg, rgba(10, 16, 26, 0.85) 0%, rgba(10, 16, 26, 0.35) 50%, rgba(10, 16, 26, 0.85) 100%)",
         },
       }),
       React.createElement(
@@ -190,9 +190,6 @@ export default async function handler(req, res) {
               gap: 24,
               padding: "36px 48px",
               borderRadius: 24,
-              background:
-                "linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.2) 100%)",
-              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
               maxWidth: "88%",
             },
           },
@@ -208,6 +205,7 @@ export default async function handler(req, res) {
                 fontSize: 64,
                 fontWeight: 700,
                 lineHeight: 1.1,
+                textShadow: "0 12px 28px rgba(0,0,0,0.55)",
               },
             },
             title
@@ -218,6 +216,7 @@ export default async function handler(req, res) {
               style: {
                 fontSize: 28,
                 color: "#f6e2a3",
+                textShadow: "0 10px 22px rgba(0,0,0,0.5)",
               },
             },
             "View photos from this event"
