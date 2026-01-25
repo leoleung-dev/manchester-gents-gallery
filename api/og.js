@@ -22,19 +22,15 @@ async function fetchEventData(slug) {
   return data?.result || null;
 }
 
-async function fetchCoverDataUrl(coverUrl) {
-  if (!coverUrl) return "";
+async function fetchCoverArrayBuffer(coverUrl) {
+  if (!coverUrl) return null;
   try {
     const res = await fetch(coverUrl);
-    if (!res.ok) return "";
-    const arrayBuffer = await res.arrayBuffer();
-    const contentType =
-      res.headers.get("content-type") || "image/jpeg";
-    const base64 = Buffer.from(arrayBuffer).toString("base64");
-    return `data:${contentType};base64,${base64}`;
+    if (!res.ok) return null;
+    return await res.arrayBuffer();
   } catch (err) {
     console.warn("OG cover fetch failed:", err);
-    return "";
+    return null;
   }
 }
 
@@ -52,11 +48,11 @@ export default async function handler(req, res) {
     cover.searchParams.set("w", "1200");
     cover.searchParams.set("h", "630");
     cover.searchParams.set("fit", "crop");
-    cover.searchParams.set("auto", "format");
+    cover.searchParams.set("fm", "jpg");
     cover.searchParams.set("q", "80");
     coverUrl = cover.toString();
   }
-  const coverDataUrl = await fetchCoverDataUrl(coverUrl);
+  const coverData = await fetchCoverArrayBuffer(coverUrl);
 
   const imageResponse = new ImageResponse(
     React.createElement(
@@ -76,9 +72,9 @@ export default async function handler(req, res) {
           overflow: "hidden",
         },
       },
-      coverDataUrl
+      coverData
         ? React.createElement("img", {
-            src: coverDataUrl,
+            src: coverData,
             width: 1200,
             height: 630,
             style: {
