@@ -173,57 +173,74 @@ export default async function handler(req, res) {
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",
-            padding: "64px",
+            alignItems: "center",
+            padding: "64px 96px",
             width: "100%",
             height: "100%",
+            textAlign: "center",
           },
         },
         React.createElement(
           "div",
-          { style: { fontSize: 28, letterSpacing: "0.04em" } },
-          "Manchester Gents"
-        ),
-        React.createElement(
-          "div",
           {
             style: {
-              marginTop: 24,
-              fontSize: 64,
-              fontWeight: 700,
-              lineHeight: 1.1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: 24,
+              padding: "36px 48px",
+              borderRadius: 24,
+              background:
+                "linear-gradient(180deg, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0.45) 55%, rgba(0,0,0,0.2) 100%)",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+              maxWidth: "88%",
             },
           },
-          title
-        ),
-        React.createElement(
-          "div",
-          {
-            style: {
-              marginTop: 24,
-              fontSize: 28,
-              color: "#f6e2a3",
-            },
-          },
-          "View photos from this event"
-        ),
-        debug
-          ? React.createElement(
-              "div",
-              {
-                style: {
-                  marginTop: 36,
-                  padding: "12px 16px",
-                  borderRadius: 8,
-                  background: "rgba(0,0,0,0.5)",
-                  color: "#ffffff",
-                  fontSize: 20,
-                  lineHeight: 1.4,
-                  maxWidth: "90%",
-                },
+          React.createElement(
+            "div",
+            { style: { fontSize: 28, letterSpacing: "0.08em" } },
+            "Manchester Gents"
+          ),
+          React.createElement(
+            "div",
+            {
+              style: {
+                fontSize: 64,
+                fontWeight: 700,
+                lineHeight: 1.1,
               },
-              `debug: coverUrl=${coverUrl ? "yes" : "no"} | bytes=${coverBytes} | source=${coverSource || "none"}`
-            )
-          : null
+            },
+            title
+          ),
+          React.createElement(
+            "div",
+            {
+              style: {
+                fontSize: 28,
+                color: "#f6e2a3",
+              },
+            },
+            "View photos from this event"
+          ),
+          debug
+            ? React.createElement(
+                "div",
+                {
+                  style: {
+                    marginTop: 12,
+                    padding: "12px 16px",
+                    borderRadius: 8,
+                    background: "rgba(0,0,0,0.5)",
+                    color: "#ffffff",
+                    fontSize: 20,
+                    lineHeight: 1.4,
+                    maxWidth: "90%",
+                  },
+                },
+                `debug: coverUrl=${coverUrl ? "yes" : "no"} | bytes=${coverBytes} | source=${coverSource || "none"}`
+              )
+            : null
+        )
       )
     ),
     {

@@ -1,0 +1,21 @@
+{
+  "generatedAt": "2026-01-25T18:37:31.473Z",
+  "events": {
+    "25Oct2025": {
+      "title": "25 October, 2025",
+      "coverUrl": "https://cdn.sanity.io/images/ulu3s1tc/production/e0d0ddbcf538930997fcfcc1e345cbaeb00837bd-4032x3024.jpg"
+    },
+    "26Apr2025": {
+      "title": "26 April, 2025",
+      "coverUrl": "https://cdn.sanity.io/images/ulu3s1tc/production/3cbd68883621a44ae3cf7bbad2c7cb1fa4cd6c0e-2048x1365.png"
+    },
+    "26Jul2025": {
+      "title": "26 July, 2025",
+      "coverUrl": "https://cdn.sanity.io/images/ulu3s1tc/production/866a730fcdd5aa92804b6a5587929f683f23a132-2048x1218.jpg"
+    },
+    "24Jan2026": {
+      "title": "24 January, 2026",
+      "coverUrl": ""
+    }
+  }
+}
