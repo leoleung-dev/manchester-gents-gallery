@@ -136,26 +136,7 @@ export default function EventGallery({ apiBase }) {
   const handleFileChange = async (e) => {
     const files = Array.from(e.target.files);
     if (!files.length) return;
-    const isHeic = (file) => {
-      const type = (file.type || "").toLowerCase();
-      const name = (file.name || "").toLowerCase();
-      return (
-        type.includes("heic") ||
-        type.includes("heif") ||
-        name.endsWith(".heic") ||
-        name.endsWith(".heif")
-      );
-    };
-    const blockedFiles = files.filter(isHeic);
-    const uploadFiles = files.filter((file) => !isHeic(file));
-    if (blockedFiles.length > 0) {
-      setFeedback({
-        type: "error",
-        message: "HEIC/HEIF images are not supported yet. Convert to JPG/PNG.",
-      });
-      setTimeout(() => setFeedback(null), 4000);
-    }
-    if (!uploadFiles.length) return;
+    const uploadFiles = files;
     if (!uploaderName.trim()) {
       setFeedback({
         type: "error",
