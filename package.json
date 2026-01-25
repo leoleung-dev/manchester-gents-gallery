@@ -3,7 +3,7 @@
   "name": "manchester-gents-gallery-full",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --host --port ${PORT:-5173}",
     "build": "node scripts/generate-event-cover-index.js && vite build && node generate-og-html.js",
     "preview": "vite preview"
   },

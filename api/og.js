@@ -1,5 +1,10 @@
 import React from "react";
 import { ImageResponse } from "@vercel/og";
+import fs from "fs";
+
+const LOGO_PNG_URL = new URL("../src/assets/Large Logo.png", import.meta.url);
+const LOGO_PNG = fs.readFileSync(LOGO_PNG_URL);
+const LOGO_DATA_URL = `data:image/png;base64,${LOGO_PNG.toString("base64")}`;
 
 const API_VERSION = "2023-08-03";
 const DEFAULT_SANITY_PROJECT_ID = "ulu3s1tc";
@@ -154,15 +159,21 @@ export default async function handler(req, res) {
               width: "1200px",
               height: "630px",
               objectFit: "cover",
+              zIndex: 0,
             },
           })
         : null,
       React.createElement("div", {
         style: {
           position: "absolute",
-          inset: 0,
-          background:
-            "linear-gradient(180deg, rgba(10, 16, 26, 0.85) 0%, rgba(10, 16, 26, 0.35) 50%, rgba(10, 16, 26, 0.85) 100%)",
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          backgroundColor: "rgba(28, 40, 55, 0.35)",
+          backgroundImage:
+            "linear-gradient(180deg, rgba(28, 40, 55, 0.75) 0%, rgba(45, 64, 89, 0.4) 50%, rgba(28, 40, 55, 0.75) 100%)",
+          zIndex: 1,
         },
       }),
       React.createElement(
@@ -178,6 +189,7 @@ export default async function handler(req, res) {
             width: "100%",
             height: "100%",
             textAlign: "center",
+            zIndex: 2,
           },
         },
         React.createElement(
@@ -195,17 +207,40 @@ export default async function handler(req, res) {
           },
           React.createElement(
             "div",
-            { style: { fontSize: 28, letterSpacing: "0.08em" } },
-            "Manchester Gents"
+            {
+              style: {
+                width: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              },
+            }
+          ,
+            React.createElement("img", {
+              src: LOGO_DATA_URL,
+              width: 360,
+              height: 144,
+              style: {
+                width: "360px",
+                height: "144px",
+                objectFit: "contain",
+                alignSelf: "center",
+              },
+            })
           ),
           React.createElement(
             "div",
             {
               style: {
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 fontSize: 64,
                 fontWeight: 700,
                 lineHeight: 1.1,
                 textShadow: "0 12px 28px rgba(0,0,0,0.55)",
+                width: "100%",
+                textAlign: "center",
               },
             },
             title
@@ -214,9 +249,14 @@ export default async function handler(req, res) {
             "div",
             {
               style: {
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
                 fontSize: 28,
                 color: "#f6e2a3",
                 textShadow: "0 10px 22px rgba(0,0,0,0.5)",
+                width: "100%",
+                textAlign: "center",
               },
             },
             "View photos from this event"
