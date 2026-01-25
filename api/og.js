@@ -1,3 +1,4 @@
+import React from "react";
 import { ImageResponse } from "@vercel/og";
 
 const API_VERSION = "2023-08-03";
@@ -29,9 +30,10 @@ export default async function handler(req, res) {
   const title = (await fetchEventTitle(slug)) || slug || "Manchester Gents";
 
   const imageResponse = new ImageResponse(
-    (
-      <div
-        style={{
+    React.createElement(
+      "div",
+      {
+        style: {
           width: "1200px",
           height: "630px",
           display: "flex",
@@ -42,31 +44,36 @@ export default async function handler(req, res) {
             "linear-gradient(135deg, #1c2837 0%, #2d4059 60%, #3e587b 100%)",
           color: "#ffd460",
           fontFamily: "Verdana, Arial, sans-serif",
-        }}
-      >
-        <div style={{ fontSize: 28, letterSpacing: "0.04em" }}>
-          Manchester Gents
-        </div>
-        <div
-          style={{
+        },
+      },
+      React.createElement(
+        "div",
+        { style: { fontSize: 28, letterSpacing: "0.04em" } },
+        "Manchester Gents"
+      ),
+      React.createElement(
+        "div",
+        {
+          style: {
             marginTop: 24,
             fontSize: 64,
             fontWeight: 700,
             lineHeight: 1.1,
-          }}
-        >
-          {title}
-        </div>
-        <div
-          style={{
+          },
+        },
+        title
+      ),
+      React.createElement(
+        "div",
+        {
+          style: {
             marginTop: 24,
             fontSize: 28,
             color: "#f6e2a3",
-          }}
-        >
-          View photos from this event
-        </div>
-      </div>
+          },
+        },
+        "View photos from this event"
+      )
     ),
     {
       width: 1200,
