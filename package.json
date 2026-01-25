@@ -17,6 +17,7 @@
     "file-saver": "^2.0.5",
     "formidable": "^3.5.4",
     "jszip": "^3.10.1",
+    "sharp": "^0.33.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^5.5.0",

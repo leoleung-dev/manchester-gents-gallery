@@ -1,6 +1,7 @@
 import React from "react";
 import { ImageResponse } from "@vercel/og";
 import fs from "fs";
+import sharp from "sharp";
 
 const LOGO_PNG_URL = new URL("../src/assets/Large Logo.png", import.meta.url);
 const LOGO_PNG = fs.readFileSync(LOGO_PNG_URL);
@@ -290,10 +291,13 @@ export default async function handler(req, res) {
 
   const arrayBuffer = await imageResponse.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  res.setHeader("Content-Type", "image/png");
+  const jpegBuffer = await sharp(buffer)
+    .jpeg({ quality: 82, mozjpeg: true })
+    .toBuffer();
+  res.setHeader("Content-Type", "image/jpeg");
   res.setHeader(
     "Cache-Control",
     "public, immutable, no-transform, max-age=31536000"
   );
-  res.status(200).send(buffer);
+  res.status(200).send(jpegBuffer);
 }
