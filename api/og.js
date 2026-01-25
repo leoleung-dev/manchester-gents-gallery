@@ -3,12 +3,13 @@ import { ImageResponse } from "@vercel/og";
 
 const API_VERSION = "2023-08-03";
 
-async function fetchEventTitle(slug) {
+async function fetchEventData(slug) {
   const projectId = process.env.SANITY_PROJECT_ID;
   const dataset = process.env.SANITY_DATASET || "production";
   if (!projectId || !slug) return null;
 
-  const query = '*[_type == "event" && slug.current == $slug][0]{title}';
+  const query =
+    '*[_type == "event" && slug.current == $slug][0]{title, "coverUrl": defaultCoverImage.asset->url}';
   const url = new URL(
     `https://${projectId}.api.sanity.io/v${API_VERSION}/data/query/${dataset}`
   );
@@ -18,7 +19,7 @@ async function fetchEventTitle(slug) {
   const res = await fetch(url.toString());
   if (!res.ok) return null;
   const data = await res.json();
-  return data?.result?.title || null;
+  return data?.result || null;
 }
 
 export default async function handler(req, res) {
@@ -27,7 +28,17 @@ export default async function handler(req, res) {
     `http://${req.headers.host || "localhost"}`
   );
   const slug = searchParams.get("slug") || "";
-  const title = (await fetchEventTitle(slug)) || slug || "Manchester Gents";
+  const event = await fetchEventData(slug);
+  const title = event?.title || slug || "Manchester Gents";
+  let coverUrl = event?.coverUrl || "";
+  if (coverUrl) {
+    const cover = new URL(coverUrl);
+    cover.searchParams.set("w", "1200");
+    cover.searchParams.set("h", "630");
+    cover.searchParams.set("fit", "crop");
+    cover.searchParams.set("auto", "format");
+    coverUrl = cover.toString();
+  }
 
   const imageResponse = new ImageResponse(
     React.createElement(
@@ -36,43 +47,80 @@ export default async function handler(req, res) {
         style: {
           width: "1200px",
           height: "630px",
+          position: "relative",
           display: "flex",
-          flexDirection: "column",
+          alignItems: "center",
           justifyContent: "center",
-          padding: "64px",
           background:
             "linear-gradient(135deg, #1c2837 0%, #2d4059 60%, #3e587b 100%)",
           color: "#ffd460",
           fontFamily: "Verdana, Arial, sans-serif",
+          overflow: "hidden",
         },
       },
-      React.createElement(
-        "div",
-        { style: { fontSize: 28, letterSpacing: "0.04em" } },
-        "Manchester Gents"
-      ),
+      coverUrl
+        ? React.createElement("img", {
+            src: coverUrl,
+            width: 1200,
+            height: 630,
+            style: {
+              position: "absolute",
+              inset: 0,
+              width: "1200px",
+              height: "630px",
+              objectFit: "cover",
+            },
+          })
+        : null,
+      React.createElement("div", {
+        style: {
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(135deg, rgba(28, 40, 55, 0.8) 0%, rgba(45, 64, 89, 0.75) 60%, rgba(62, 88, 123, 0.7) 100%)",
+        },
+      }),
       React.createElement(
         "div",
         {
           style: {
-            marginTop: 24,
-            fontSize: 64,
-            fontWeight: 700,
-            lineHeight: 1.1,
+            position: "relative",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            padding: "64px",
+            width: "100%",
+            height: "100%",
           },
         },
-        title
-      ),
-      React.createElement(
-        "div",
-        {
-          style: {
-            marginTop: 24,
-            fontSize: 28,
-            color: "#f6e2a3",
+        React.createElement(
+          "div",
+          { style: { fontSize: 28, letterSpacing: "0.04em" } },
+          "Manchester Gents"
+        ),
+        React.createElement(
+          "div",
+          {
+            style: {
+              marginTop: 24,
+              fontSize: 64,
+              fontWeight: 700,
+              lineHeight: 1.1,
+            },
           },
-        },
-        "View photos from this event"
+          title
+        ),
+        React.createElement(
+          "div",
+          {
+            style: {
+              marginTop: 24,
+              fontSize: 28,
+              color: "#f6e2a3",
+            },
+          },
+          "View photos from this event"
+        )
       )
     ),
     {
