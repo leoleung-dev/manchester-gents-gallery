@@ -4,6 +4,10 @@ import { ImageResponse } from "@vercel/og";
 const API_VERSION = "2023-08-03";
 const DEFAULT_SANITY_PROJECT_ID = "ulu3s1tc";
 const DEFAULT_SANITY_DATASET = "production";
+const COVER_INDEX_PATH = "/event-cover-index.json";
+const COVER_INDEX_TTL_MS = 5 * 60 * 1000;
+
+let coverIndexCache = { data: null, fetchedAt: 0 };
 
 async function fetchEventData(slug) {
   const projectId =
@@ -36,6 +40,35 @@ async function fetchEventData(slug) {
   return data?.result || null;
 }
 
+function getBaseUrl(req) {
+  if (process.env.SITE_URL) return process.env.SITE_URL;
+  const proto = req.headers["x-forwarded-proto"] || "http";
+  const host = req.headers.host || "localhost";
+  return `${proto}://${host}`;
+}
+
+async function fetchCoverIndex(baseUrl) {
+  if (!baseUrl) return null;
+  const now = Date.now();
+  if (
+    coverIndexCache.data &&
+    now - coverIndexCache.fetchedAt < COVER_INDEX_TTL_MS
+  ) {
+    return coverIndexCache.data;
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}${COVER_INDEX_PATH}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    coverIndexCache = { data, fetchedAt: now };
+    return data;
+  } catch (err) {
+    console.warn("OG cover index fetch failed:", err);
+    return null;
+  }
+}
+
 async function fetchCoverArrayBuffer(coverUrl) {
   if (!coverUrl) return null;
   try {
@@ -56,9 +89,24 @@ export default async function handler(req, res) {
   const slug = searchParams.get("slug") || "";
   const debug = searchParams.get("debug") === "1";
   const imageParam = searchParams.get("image") || "";
+  const baseUrl = getBaseUrl(req);
   const event = await fetchEventData(slug);
-  const title = event?.title || slug || "Manchester Gents";
+  let title = event?.title || slug || "Manchester Gents";
   let coverUrl = imageParam || event?.coverUrl || "";
+  let coverSource = imageParam ? "query" : event?.coverUrl ? "sanity" : "";
+
+  if (!coverUrl && slug) {
+    const coverIndex = await fetchCoverIndex(baseUrl);
+    const entry = coverIndex?.events?.[slug];
+    if (entry?.coverUrl) {
+      coverUrl = entry.coverUrl;
+      coverSource = "index";
+    }
+    if (!event?.title && entry?.title) {
+      title = entry.title;
+    }
+  }
+
   if (coverUrl && !imageParam) {
     const cover = new URL(coverUrl);
     cover.searchParams.set("w", "1200");
@@ -173,7 +221,7 @@ export default async function handler(req, res) {
                   maxWidth: "90%",
                 },
               },
-              `debug: coverUrl=${coverUrl ? "yes" : "no"} | bytes=${coverBytes}`
+              `debug: coverUrl=${coverUrl ? "yes" : "no"} | bytes=${coverBytes} | source=${coverSource || "none"}`
             )
           : null
       )

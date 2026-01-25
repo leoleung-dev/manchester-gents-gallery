@@ -1,8 +1,12 @@
 const API_VERSION = "2023-08-03";
 const DEFAULT_SANITY_PROJECT_ID = "ulu3s1tc";
 const DEFAULT_SANITY_DATASET = "production";
+const COVER_INDEX_PATH = "/event-cover-index.json";
+const COVER_INDEX_TTL_MS = 5 * 60 * 1000;
 
 const SITE_URL = process.env.SITE_URL || "https://photos.manchestergents.com";
+
+let coverIndexCache = { data: null, fetchedAt: 0 };
 
 const escapeHtml = (value) =>
   value
@@ -43,6 +47,28 @@ async function fetchEventData(slug) {
   return data?.result || null;
 }
 
+async function fetchCoverIndex() {
+  if (!SITE_URL) return null;
+  const now = Date.now();
+  if (
+    coverIndexCache.data &&
+    now - coverIndexCache.fetchedAt < COVER_INDEX_TTL_MS
+  ) {
+    return coverIndexCache.data;
+  }
+
+  try {
+    const res = await fetch(`${SITE_URL}${COVER_INDEX_PATH}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    coverIndexCache = { data, fetchedAt: now };
+    return data;
+  } catch (err) {
+    console.warn("OG cover index fetch failed:", err);
+    return null;
+  }
+}
+
 export default async function handler(req, res) {
   if (req.method !== "GET") {
     res.setHeader("Allow", ["GET"]);
@@ -67,6 +93,16 @@ export default async function handler(req, res) {
       }
     } catch (err) {
       console.warn("OG page fetch failed:", err);
+    }
+  }
+  if (slug && (!imageParam || title === "Manchester Gents")) {
+    const coverIndex = await fetchCoverIndex();
+    const entry = coverIndex?.events?.[slug];
+    if (!imageParam && entry?.coverUrl) {
+      imageParam = entry.coverUrl;
+    }
+    if (title === "Manchester Gents" && entry?.title) {
+      title = entry.title;
     }
   }
 
