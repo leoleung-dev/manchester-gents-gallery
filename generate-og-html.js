@@ -34,7 +34,7 @@ async function run() {
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Manchester Gents | View photos from: ${event.title}" />
     <meta property="og:description" content="See all the best shots from ${event.title}!" />
-    <meta property="og:image" content="https://mg-og-generator.vercel.app/api/og?slug=${event.slug}" />
+    <meta property="og:image" content="https://photos.manchestergents.com/api/og?slug=${event.slug}" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://photos.manchestergents.com/share/${event.slug}" />
 
@@ -42,7 +42,7 @@ async function run() {
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Manchester Gents | View photos from: ${event.title}" />
     <meta name="twitter:description" content="See all the best shots from ${event.title}!" />
-    <meta name="twitter:image" content="https://mg-og-generator.vercel.app/api/og?slug=${event.slug}" />
+    <meta name="twitter:image" content="https://photos.manchestergents.com/api/og?slug=${event.slug}" />
 
     <!-- Redirect for human users -->
     <script>

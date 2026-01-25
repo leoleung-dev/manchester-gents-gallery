@@ -13,6 +13,17 @@
   ],
   "routes": [
     {
+      "src": "/event/(?<slug>[^/]+)",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(bot|crawl|spider|facebookexternalhit|slack|discord|twitterbot|linkedin|whatsapp|opengraph).*"
+        }
+      ],
+      "dest": "/api/og-page?slug=$slug"
+    },
+    {
       "src": "/share/(?<slug>[^/]+)",
       "dest": "/share/$slug/index.html"
     },
