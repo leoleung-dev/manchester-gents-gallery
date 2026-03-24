@@ -86,39 +86,62 @@
 ## Architecture
 
 ```mermaid
-flowchart TD
-  A[Browser: React SPA] --> B[Routes: /, /event/:slug, /admin, /event/:slug/admin]
-  B --> C[/api/getEventSlugs]
-  B --> D[/api/getEventPhotos]
-  B --> E[/api/addComment]
-  B --> F[/api/createEvent]
-  B --> G[/api/deletePhoto / bulkDeletePhoto]
-  B --> H[/api/deleteComment]
-  B --> I[/api/setCoverImage]
-  B --> J[/api/uploadImages]
+graph TD
+  Browser["Browser (React SPA)"] --> Routes["Routes: /, /event/:slug, /admin, /event/:slug/admin"]
 
-  C --> K[(Sanity Content Lake)]
-  D --> K
-  E --> K
-  F --> K
-  G --> K
-  H --> K
-  I --> K
+  Routes --> APIEvents["/api/getEventSlugs"]
+  Routes --> APIPhotos["/api/getEventPhotos"]
+  Routes --> APIComment["/api/addComment"]
+  Routes --> APICreate["/api/createEvent"]
+  Routes --> APIDeletePhoto["/api/deletePhoto + /api/bulkDeletePhoto"]
+  Routes --> APIDeleteComment["/api/deleteComment"]
+  Routes --> APICover["/api/setCoverImage"]
+  Routes --> APIUpload["/api/uploadImages"]
 
-  J --> U[mg-fly-uploadserver.fly.dev/upload]
-  J --> K
+  APIEvents --> Sanity[("Sanity Content Lake")]
+  APIPhotos --> Sanity
+  APIComment --> Sanity
+  APICreate --> Sanity
+  APIDeletePhoto --> Sanity
+  APIDeleteComment --> Sanity
+  APICover --> Sanity
 
-  L[Social bots] --> M[vercel.json bot route for /event/:slug]
-  M --> N[/api/og-page]
-  N --> O[/api/og]
-  O --> K
-  N --> P[public/event-cover-index.json]
-  O --> P
+  APIUpload --> UploadProxy["mg-fly-uploadserver.fly.dev/upload"]
+  APIUpload --> Sanity
 
-  Q[npm run build] --> R[scripts/generate-event-cover-index.js]
-  Q --> S[generate-og-html.js]
-  R --> P
-  S --> T[dist/event/*/share/index.html]
+  Bots["Social bots"] --> BotRoute["vercel.json route for /event/:slug"]
+  BotRoute --> OGPage["/api/og-page"]
+  OGPage --> OGImage["/api/og"]
+  OGImage --> Sanity
+  OGPage --> CoverIndex["public/event-cover-index.json"]
+  OGImage --> CoverIndex
+
+  Build["npm run build"] --> CoverScript["scripts/generate-event-cover-index.js"]
+  Build --> OGScript["generate-og-html.js"]
+  CoverScript --> CoverIndex
+  OGScript --> ShareHTML["dist/event/<slug>/share/index.html"]
+```
+
+```text
+Fallback (for Markdown viewers without Mermaid support):
+
+Browser (React SPA)
+  -> Routes (/, /event/:slug, /admin, /event/:slug/admin)
+    -> /api/getEventSlugs ---------------------\
+    -> /api/getEventPhotos --------------------+--> Sanity Content Lake
+    -> /api/addComment ------------------------+
+    -> /api/createEvent -----------------------+
+    -> /api/deletePhoto + /api/bulkDeletePhoto+
+    -> /api/deleteComment ---------------------+
+    -> /api/setCoverImage ---------------------+
+    -> /api/uploadImages -> mg-fly-uploadserver.fly.dev/upload
+    -> /api/uploadImages ----------------------+
+
+Social bots -> vercel.json bot route -> /api/og-page -> /api/og -> Sanity
+                                                \--> public/event-cover-index.json
+
+npm run build -> scripts/generate-event-cover-index.js -> public/event-cover-index.json
+npm run build -> generate-og-html.js -> dist/event/<slug>/share/index.html
 ```
 
 ## Security and reliability highlights
