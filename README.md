@@ -250,8 +250,3 @@ Sanity Studio scripts from `sanity/package.json`:
 5. Confirm OG output:
    - `/api/og-page?slug=<eventSlug>`
    - `/api/og?slug=<eventSlug>`
-
-## License
-
-No root `LICENSE` file is present in this repository.  
-The co-located Sanity Studio package declares `UNLICENSED` in `sanity/package.json`.
