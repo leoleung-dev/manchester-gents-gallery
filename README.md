@@ -121,29 +121,6 @@ graph TD
   CoverScript --> CoverIndex
   OGScript --> ShareHTML["dist/event/<slug>/share/index.html"]
 ```
-
-```text
-Fallback (for Markdown viewers without Mermaid support):
-
-Browser (React SPA)
-  -> Routes (/, /event/:slug, /admin, /event/:slug/admin)
-    -> /api/getEventSlugs ---------------------\
-    -> /api/getEventPhotos --------------------+--> Sanity Content Lake
-    -> /api/addComment ------------------------+
-    -> /api/createEvent -----------------------+
-    -> /api/deletePhoto + /api/bulkDeletePhoto+
-    -> /api/deleteComment ---------------------+
-    -> /api/setCoverImage ---------------------+
-    -> /api/uploadImages -> mg-fly-uploadserver.fly.dev/upload
-    -> /api/uploadImages ----------------------+
-
-Social bots -> vercel.json bot route -> /api/og-page -> /api/og -> Sanity
-                                                \--> public/event-cover-index.json
-
-npm run build -> scripts/generate-event-cover-index.js -> public/event-cover-index.json
-npm run build -> generate-og-html.js -> dist/event/<slug>/share/index.html
-```
-
 ## Security and reliability highlights
 
 - CORS allowlist is centralized in `src/lib/setCorsHeaders.js` and applied across API handlers.
